@@ -43,26 +43,20 @@
 	},
 	"upload_source_maps": true,
 	"keep_vars": true,
-	"vars": {
-		"EMAIL_FROM": "Paymug <updates@paymug.co>"
-	},
 	/**
 	 * D1 (SQLite) — used via Drizzle ORM (`src/db`).
-	 * D1 and R2 are intentionally declared without account-specific resource IDs.
-	 * Wrangler provisions and binds resources independently for every fork.
+	 * These draft bindings intentionally omit account-specific resource names and IDs.
+	 * Cloudflare provisions and binds unique resources for every deployment.
 	 */
 	"d1_databases": [
 		{
-			"database_name": "paymug",
-			"database_id": "b3b7f615-f3b1-4bdf-9f0a-e099b8cb6700",
 			"binding": "DB",
 			"migrations_dir": "drizzle"
 		}
 	],
 	"r2_buckets": [
 		{
-			"binding": "PRODUCT_FILES",
-			"bucket_name": "paymug-app-product-files"
+			"binding": "PRODUCT_FILES"
 		}
 	],
 	"triggers": {
