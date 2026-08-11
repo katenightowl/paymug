@@ -747,18 +747,40 @@ export function ProductForm({
                 name="githubRepository"
                 value={githubRepoFullName}
                 onValueChange={setGitHubRepoFullName}
+                onOpenChange={(open) => {
+                  if (!open) return;
+                  void fetchGitHubRepositories()
+                    .then((data) => {
+                      setGitHubConnected(data.connected);
+                      setGitHubRepositories(data.repositories);
+                    })
+                    .catch((repositoryError) => {
+                      setError(
+                        repositoryError instanceof Error
+                          ? repositoryError.message
+                          : "Could not refresh GitHub repositories",
+                      );
+                    });
+                }}
+                searchable
+                searchPlaceholder="Search private repositories…"
+                menuClassName="!w-full !max-w-none"
                 required
                 options={[
                   { value: "", label: "Choose a repository" },
                   ...githubRepositories.map((repository) => ({
                     value: repository.fullName,
-                    label: repository.fullName,
+                    label: repository.disabledReason
+                      ? `${repository.fullName} — ${repository.disabledReason}`
+                      : repository.fullName,
+                    disabled: repository.disabled,
                   })),
                 ]}
               />
               <p className="mt-2 text-xs leading-5 text-muted">
-                Only private repositories where the connected account has
-                administrator permission are shown.
+                Private repositories refresh whenever this menu opens.
+                Repositories without administrator permission cannot be used
+                to invite customers.
               </p>
             </div>
           ) : null}

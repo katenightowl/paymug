@@ -4,6 +4,7 @@ import { CaretDown, Check } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { labelClass } from "./ui.styles";
 import {
+  filterCustomSelectOptions,
   getCustomSelectOptionIndex,
   getNextCustomSelectOptionIndex,
 } from "./custom-select.utils";
@@ -24,18 +25,25 @@ export function CustomSelect({
   triggerClassName = "",
   menuClassName = "",
   menuFooter,
+  searchable = false,
+  searchPlaceholder = "Search…",
+  onOpenChange,
   variant = "field",
 }: CustomSelectProps) {
   const generatedId = useId();
   const inputId = id || name || generatedId;
   const menuId = `${inputId}-menu`;
   const rootRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const previousOpenRef = useRef(false);
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(() =>
     getCustomSelectOptionIndex(options, value),
   );
   const selectedOption =
     options.find((option) => option.value === value) || options[0];
+  const filteredOptions = filterCustomSelectOptions(options, searchQuery);
 
   useEffect(() => {
     setActiveIndex(getCustomSelectOptionIndex(options, value));
@@ -50,6 +58,19 @@ export function CustomSelect({
     return () =>
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
   }, [open]);
+
+  useEffect(() => {
+    if (previousOpenRef.current === open) return;
+    previousOpenRef.current = open;
+    onOpenChange?.(open);
+    if (!open) {
+      setSearchQuery("");
+      return;
+    }
+    if (searchable) {
+      requestAnimationFrame(() => searchInputRef.current?.focus());
+    }
+  }, [onOpenChange, open, searchable]);
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -123,14 +144,44 @@ export function CustomSelect({
 
       {open && (
         <div
-          id={menuId}
-          role="listbox"
-          aria-label={ariaLabel || label}
           className={`absolute left-0 top-[calc(100%+0.65rem)] z-70 max-h-96 overflow-y-auto rounded-xl border border-[#d7e0ea] bg-white py-3 shadow-[0_20px_45px_rgba(28,39,55,0.18)] w-auto min-w-46 max-w-68 ${
             variant === "plain" ? "" : ""
           } ${menuClassName}`}
         >
-          {options.map((option, index) => {
+          {searchable && (
+            <div className="px-3 pb-2">
+              <input
+                ref={searchInputRef}
+                type="search"
+                role="searchbox"
+                value={searchQuery}
+                placeholder={searchPlaceholder}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  event.stopPropagation();
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    setOpen(false);
+                    return;
+                  }
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    const option =
+                      filteredOptions.find(
+                        (candidate) =>
+                          !candidate.disabled && Boolean(candidate.value),
+                      ) || filteredOptions.find((candidate) => !candidate.disabled);
+                    if (option) onValueChange(option.value);
+                    if (option) setOpen(false);
+                  }
+                }}
+                className="min-h-10 w-full rounded-lg border border-[#d7e0ea] bg-white px-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              />
+            </div>
+          )}
+          <div id={menuId} role="listbox" aria-label={ariaLabel || label}>
+          {filteredOptions.map((option) => {
+            const index = options.indexOf(option);
             const selected = option.value === value;
             const active = false; //index === activeIndex;
             return (
@@ -160,6 +211,12 @@ export function CustomSelect({
               </button>
             );
           })}
+          {filteredOptions.length === 0 && (
+            <p className="px-4 py-3 text-sm text-[#85859d]">
+              No matching options
+            </p>
+          )}
+          </div>
           {menuFooter && (
             <div className="mt-2 border-t border-[#e8e8ee] pt-2" role="presentation">
               {menuFooter}

@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import { decryptSecret } from "@/lib/crypto";
 import { getGitHubConnection } from "@/lib/db";
-import { listGitHubAdminRepositories } from "@/lib/github-api";
+import { listGitHubPrivateRepositories } from "@/lib/github-api";
 import { jsonError } from "@/lib/utils";
 
 export async function GET() {
@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   try {
-    const repositories = await listGitHubAdminRepositories(
+    const repositories = await listGitHubPrivateRepositories(
       await decryptSecret(connection.accessTokenEncrypted)
     );
     return Response.json({
@@ -28,6 +28,10 @@ export async function GET() {
         name: repository.name,
         fullName: repository.full_name,
         url: repository.html_url,
+        disabled: !repository.permissions?.admin,
+        disabledReason: repository.permissions?.admin
+          ? undefined
+          : "Admin access required",
       })),
     });
   } catch (error) {

@@ -18,6 +18,8 @@ export interface GitHubRepositoryOption {
   name: string;
   fullName: string;
   url: string;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 export interface GitHubRepositoriesResponse {

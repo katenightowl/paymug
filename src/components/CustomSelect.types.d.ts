@@ -21,5 +21,8 @@ export interface CustomSelectProps {
   triggerClassName?: string;
   menuClassName?: string;
   menuFooter?: ReactNode;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  onOpenChange?(open: boolean): void;
   variant?: "field" | "plain";
 }

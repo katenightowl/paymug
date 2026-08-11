@@ -22,3 +22,14 @@ export function getNextCustomSelectOptionIndex(
   }
   return currentIndex;
 }
+
+export function filterCustomSelectOptions(
+  options: CustomSelectOption[],
+  query: string,
+): CustomSelectOption[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return options;
+  return options.filter((option) =>
+    option.label.toLowerCase().includes(normalizedQuery),
+  );
+}

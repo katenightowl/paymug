@@ -122,13 +122,25 @@ export async function findGitHubUserByPublicEmail(
 export async function listGitHubAdminRepositories(
   accessToken: string
 ): Promise<GitHubRepository[]> {
-  const response = await githubRequest<GitHubRepository[]>(
-    accessToken,
-    "/user/repos?visibility=private&affiliation=owner,collaborator,organization_member&sort=full_name&direction=asc&per_page=100"
-  );
-  return (response.data || []).filter(
+  return (await listGitHubPrivateRepositories(accessToken)).filter(
     (repository) => repository.private && repository.permissions?.admin
   );
+}
+
+export async function listGitHubPrivateRepositories(
+  accessToken: string,
+): Promise<GitHubRepository[]> {
+  const repositories: GitHubRepository[] = [];
+  for (let page = 1; page <= 10; page += 1) {
+    const response = await githubRequest<GitHubRepository[]>(
+      accessToken,
+      `/user/repos?visibility=private&affiliation=owner,collaborator,organization_member&sort=full_name&direction=asc&per_page=100&page=${page}`,
+    );
+    const pageRepositories = response.data || [];
+    repositories.push(...pageRepositories);
+    if (pageRepositories.length < 100) break;
+  }
+  return repositories;
 }
 
 export async function addGitHubRepositoryCollaborator(
