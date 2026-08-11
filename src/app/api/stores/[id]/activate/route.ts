@@ -1,0 +1,17 @@
+import { getSessionUser } from "@/lib/auth";
+import { setActiveStore } from "@/lib/stores";
+import { jsonError } from "@/lib/utils";
+import type { ActivateStoreRouteProps } from "./route.types";
+
+export async function POST(
+  _request: Request,
+  { params }: ActivateStoreRouteProps
+) {
+  const user = await getSessionUser();
+  if (!user) return jsonError("Unauthorized", 401);
+  const { id } = await params;
+  if (!(await setActiveStore(user.id, id))) {
+    return jsonError("Store not found", 404);
+  }
+  return Response.json({ ok: true });
+}

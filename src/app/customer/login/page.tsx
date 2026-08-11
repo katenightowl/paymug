@@ -1,0 +1,40 @@
+import { redirect } from "next/navigation";
+import { Logo } from "@/components/Logo";
+import { Alert } from "@/components/ui";
+import { getCustomerSession } from "@/lib/customer-auth";
+import { CustomerLoginForm } from "./CustomerLoginForm";
+import type { CustomerLoginPageProps } from "./page.types";
+
+export default async function CustomerLoginPage({
+  searchParams,
+}: CustomerLoginPageProps) {
+  if (await getCustomerSession()) redirect("/customer");
+  const query = await searchParams;
+
+  return (
+    <main className="min-h-screen bg-background px-4 py-10">
+      <div className="mx-auto max-w-4xl">
+        <Logo />
+        <div className="mt-10">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Customer portal
+          </h1>
+          <p className="mt-2 text-base text-muted">
+            Access your purchases, licenses, repository access, and
+            subscriptions.
+          </p>
+        </div>
+        {query.error && (
+          <div className="mt-6">
+            <Alert>
+              This sign-in link is invalid, expired, or has already been used.
+            </Alert>
+          </div>
+        )}
+        <div className="mt-7">
+          <CustomerLoginForm />
+        </div>
+      </div>
+    </main>
+  );
+}
