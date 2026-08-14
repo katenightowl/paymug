@@ -209,11 +209,8 @@ export function SetupClient() {
             className="w-full"
             variant="outline"
             onClick={() => void checkConfiguration()}
-            disabled={configurationStatus === "loading"}
           >
-            {configurationStatus === "loading"
-              ? "Checking…"
-              : "Check configuration again"}
+            Check configuration again
           </Button>
         ) : configurationStatus === "complete" ? (
           <Link
