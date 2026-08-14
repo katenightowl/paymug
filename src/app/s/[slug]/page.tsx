@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AppIcon } from "@/components/dashboard/Icon";
 import { StoreSubscribeForm } from "@/components/StoreSubscribeForm";
 import { cardClass } from "@/components/ui.styles";
+import { getSessionUser } from "@/lib/auth";
 import { findUserByStoreSlug, listProductsByUser } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { formatProductPriceSuffix } from "@/lib/product-billing";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/license-entitlements";
 import { getProductDescriptionPlainText } from "@/components/product-description.utils";
 import { getStoreById } from "@/lib/stores";
+import { resolveStorefrontEnvironment } from "@/lib/storefront-environment.utils";
 import Powered from "@/components/PoweredBy";
 import { generateStorefrontMetadata } from "./page.utils";
 import type { StorefrontPageProps } from "./page.types";
@@ -22,14 +24,27 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
   const { slug } = await params;
   const seller = await findUserByStoreSlug(slug);
   if (!seller) notFound();
-  const store = await getStoreById(seller.activeStoreId, seller.id);
-
-  const products = (
-    await listProductsByUser(seller.id, seller.activeStoreId, "live")
-  ).filter((p) => p.status === "published");
+  const viewer = await getSessionUser();
+  const environment = resolveStorefrontEnvironment(
+    seller.id,
+    seller.environment,
+    viewer?.id,
+  );
+  const [store, allProducts] = await Promise.all([
+    getStoreById(seller.activeStoreId, seller.id),
+    listProductsByUser(seller.id, seller.activeStoreId, environment),
+  ]);
+  const products = allProducts.filter((p) => p.status === "published");
+  const isTestMode = environment === "sandbox";
 
   return (
     <div className="flex min-h-screen flex-col">
+      {isTestMode && (
+        <div className="bg-amber-300 px-6 py-2 text-center text-sm text-amber-950">
+          Test mode — you are viewing sandbox store data. Customers still see
+          the live store.
+        </div>
+      )}
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12">
         {seller.storeCoverImageUrl && (
           <img
@@ -89,7 +104,7 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
             {products.map((p) => (
               <Link
                 key={p.id}
-                href={`/buy/${p.id}`}
+                href={`/buy/${p.id}${isTestMode ? "?preview" : ""}`}
                 className={`${cardClass} group flex flex-col p-5 transition hover:border-accent/50 hover:shadow-md`}
               >
                 {p.imageUrl ? (

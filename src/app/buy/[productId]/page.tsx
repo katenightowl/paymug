@@ -35,7 +35,7 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
   const isPreview =
     product.status !== "published" || product.environment === "sandbox";
   if (isPreview) {
-    if (preview === undefined) notFound();
+    if (product.status !== "published" && preview === undefined) notFound();
     const user = await getSessionUser();
     if (user?.id !== product.userId) notFound();
   }
@@ -63,7 +63,7 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
         )
       : undefined;
   const initialPricing = calculateCheckoutPricing(product);
-  const isSandbox = paypal?.mode === "sandbox" || stripe?.mode === "sandbox";
+  const isSandbox = product.environment === "sandbox";
   const perpetualLicense = isPerpetualLicenseProduct(product);
   const priceSuffix = perpetualLicense ? "" : formatProductPriceSuffix(product);
   const billingSummary = formatProductBillingSummary(product);
