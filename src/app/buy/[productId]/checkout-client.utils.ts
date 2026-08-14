@@ -8,10 +8,6 @@ export function isValidCheckoutEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
-export function isValidGitHubUsername(value: string): boolean {
-  return /^(?!-)(?!.*--)[A-Za-z0-9-]{1,39}(?<!-)$/.test(value.trim());
-}
-
 export async function fetchDiscountPreview(
   productId: string,
   code: string
@@ -66,7 +62,6 @@ export async function startPayPalSubscriptionCheckout(input: {
   productId: string;
   customerEmail: string;
   customerName?: string;
-  githubUsername?: string;
   discountCode?: string;
   affiliateCode?: string;
   marketingOptIn?: boolean;

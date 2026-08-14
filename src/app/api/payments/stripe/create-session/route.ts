@@ -10,7 +10,6 @@ import {
   findProductById,
   updateOrder,
 } from "@/lib/db";
-import { validateGitHubBuyerUsername } from "@/lib/github-products";
 import { getStripeCredentials } from "@/lib/payment-credentials";
 import { notifyInvoiceCreated } from "@/lib/notification-events";
 import {
@@ -29,11 +28,6 @@ const schema = z.object({
   productId: z.string().min(1),
   customerEmail: z.string().email(),
   customerName: z.string().max(120).optional(),
-  githubUsername: z
-    .string()
-    .trim()
-    .regex(/^(?!-)(?!.*--)[A-Za-z0-9-]{1,39}(?<!-)$/)
-    .optional(),
   discountCode: z.string().max(60).optional(),
   affiliateCode: z.string().max(80).optional(),
   marketingOptIn: z.boolean().optional(),
@@ -61,23 +55,6 @@ export async function POST(request: Request) {
     if (!connection) {
       return jsonError("Seller has not configured Stripe yet", 400);
     }
-    if (
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      !parsed.data.githubUsername
-    ) {
-      return jsonError("GitHub username is required for this product", 400);
-    }
-    const githubUsername =
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      parsed.data.githubUsername
-        ? await validateGitHubBuyerUsername(
-            product.userId,
-            product.storeId,
-            parsed.data.githubUsername
-          )
-        : undefined;
     const discount = await resolveDiscount(
       product.userId,
       parsed.data.discountCode,
@@ -179,7 +156,6 @@ export async function POST(request: Request) {
       environment: connection.mode,
       gateway: "stripe",
       createdAt: new Date().toISOString(),
-      githubUsername,
       githubAccessStatus:
         product.githubRepoOwner && product.githubRepoName
           ? "pending"

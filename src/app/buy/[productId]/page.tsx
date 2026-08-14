@@ -170,9 +170,6 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
               stripeEnabled={Boolean(stripe)}
               mode={paypal?.mode || stripe?.mode || "sandbox"}
               currency={product.currency}
-              requiresGitHubUsername={Boolean(
-                product.githubRepoOwner && product.githubRepoName,
-              )}
               isSubscription={isSubscriptionProduct(product)}
               billingSummary={billingSummary}
               priceSuffix={priceSuffix}

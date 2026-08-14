@@ -2,7 +2,6 @@ export interface CompleteFreePurchaseInput {
   productId: string;
   customerEmail: string;
   customerName?: string;
-  githubUsername?: string;
   discountCode?: string;
   affiliateCode?: string;
   marketingOptIn?: boolean;

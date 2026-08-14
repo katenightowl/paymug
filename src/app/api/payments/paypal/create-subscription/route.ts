@@ -11,7 +11,6 @@ import {
   updateFeatureRecord,
 } from "@/lib/feature-records";
 import { findProductById } from "@/lib/db";
-import { validateGitHubBuyerUsername } from "@/lib/github-products";
 import { getPayPalCredentials } from "@/lib/payment-credentials";
 import {
   formatProductIntervalLabel,
@@ -29,11 +28,6 @@ const schema = z.object({
   productId: z.string().min(1),
   customerEmail: z.string().email(),
   customerName: z.string().max(120).optional(),
-  githubUsername: z
-    .string()
-    .trim()
-    .regex(/^(?!-)(?!.*--)[A-Za-z0-9-]{1,39}(?<!-)$/)
-    .optional(),
   discountCode: z.string().max(60).optional(),
   affiliateCode: z.string().max(80).optional(),
   marketingOptIn: z.boolean().optional(),
@@ -71,24 +65,6 @@ export async function POST(req: Request) {
     if (!conn) {
       return jsonError("Seller has not configured PayPal yet", 400);
     }
-
-    if (
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      !parsed.data.githubUsername
-    ) {
-      return jsonError("GitHub username is required for this product", 400);
-    }
-    const githubUsername =
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      parsed.data.githubUsername
-        ? await validateGitHubBuyerUsername(
-            product.userId,
-            product.storeId,
-            parsed.data.githubUsername
-          )
-        : undefined;
 
     const discount = await resolveDiscount(
       product.userId,
@@ -168,7 +144,7 @@ export async function POST(req: Request) {
         transactionFeeAmount: pricing.transactionFeeAmount,
         regularTransactionFeeAmount: fullPricing.transactionFeeAmount,
         affiliateId: affiliate?.id || null,
-        githubUsername: githubUsername || null,
+        githubUsername: null,
         customerName: parsed.data.customerName || null,
         environment: conn.mode,
         source: "product_checkout",
@@ -214,7 +190,6 @@ export async function POST(req: Request) {
         affiliateId: affiliate?.id,
         environment: conn.mode,
         paypalSubscriptionId: provisioned.paypalSubscriptionId,
-        githubUsername,
       });
       return Response.json({
         recordId: record.id,

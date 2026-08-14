@@ -6,11 +6,6 @@ const schema = z.object({
   productId: z.string().min(1),
   customerEmail: z.string().email(),
   customerName: z.string().max(120).optional(),
-  githubUsername: z
-    .string()
-    .trim()
-    .regex(/^(?!-)(?!.*--)[A-Za-z0-9-]{1,39}(?<!-)$/)
-    .optional(),
   discountCode: z.string().max(60).optional(),
   affiliateCode: z.string().max(80).optional(),
   marketingOptIn: z.boolean().optional(),

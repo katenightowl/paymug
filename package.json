@@ -2,10 +2,10 @@
   "name": "paymug-app",
   "version": "0.1.8",
   "private": true,
-  "packageManager": "npm@10.9.2",
+  "packageManagerx": "npm@10.9.2",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/write-paymug-build-info.mjs",
+    "prebuild": "node scripts/generate-runtime-migrations.mjs && node scripts/write-paymug-build-info.mjs",
     "build": "opennextjs-cloudflare build",
     "build:next": "next build",
     "start": "next start",

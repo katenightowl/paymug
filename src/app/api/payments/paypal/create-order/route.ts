@@ -16,7 +16,6 @@ import { createPayPalOrder } from "@/lib/paypal";
 import { calculateCheckoutPricing } from "@/lib/product-pricing";
 import { getRuntimeAbsoluteUrl } from "@/lib/runtime-env";
 import { jsonError, uid } from "@/lib/utils";
-import { validateGitHubBuyerUsername } from "@/lib/github-products";
 import { getStoreById } from "@/lib/stores";
 import { affiliateCookieMatchesStore } from "@/lib/affiliate-settings.utils";
 
@@ -24,11 +23,6 @@ const schema = z.object({
   productId: z.string().min(1),
   customerEmail: z.string().email(),
   customerName: z.string().max(120).optional(),
-  githubUsername: z
-    .string()
-    .trim()
-    .regex(/^(?!-)(?!.*--)[A-Za-z0-9-]{1,39}(?<!-)$/)
-    .optional(),
   discountCode: z.string().max(60).optional(),
   affiliateCode: z.string().max(80).optional(),
   marketingOptIn: z.boolean().optional(),
@@ -65,27 +59,6 @@ export async function POST(req: Request) {
     if (!conn) {
       return jsonError("Seller has not configured PayPal yet", 400);
     }
-    if (
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      !parsed.data.githubUsername
-    ) {
-      return jsonError(
-        "GitHub username is required for this product",
-        400
-      );
-    }
-    const githubUsername =
-      product.githubRepoOwner &&
-      product.githubRepoName &&
-      parsed.data.githubUsername
-          ? await validateGitHubBuyerUsername(
-            product.userId,
-            product.storeId,
-            parsed.data.githubUsername
-          )
-        : undefined;
-
     const discount = await resolveDiscount(
       product.userId,
       parsed.data.discountCode,
@@ -151,7 +124,6 @@ export async function POST(req: Request) {
       environment: conn.mode,
       gateway: "paypal",
       createdAt: new Date().toISOString(),
-      githubUsername,
       githubAccessStatus:
         product.githubRepoOwner && product.githubRepoName
           ? "pending"

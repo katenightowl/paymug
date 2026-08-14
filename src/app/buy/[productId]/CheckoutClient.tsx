@@ -9,7 +9,6 @@ import {
   completeFreePurchase,
   fetchDiscountPreview,
   isValidCheckoutEmail,
-  isValidGitHubUsername,
   startPayPalSubscriptionCheckout,
   trackAffiliateVisit,
 } from "./checkout-client.utils";
@@ -34,7 +33,6 @@ export function CheckoutClient({
   stripeEnabled,
   mode,
   currency,
-  requiresGitHubUsername,
   isSubscription = false,
   billingSummary,
   priceSuffix = "",
@@ -53,7 +51,6 @@ export function CheckoutClient({
     normalizedInitialDiscountCode,
   );
   const [marketingOptIn, setMarketingOptIn] = useState(true);
-  const [githubUsername, setGitHubUsername] = useState("");
   const [touched, setTouched] = useState(false);
   const [discountStatus, setDiscountStatus] = useState<
     "idle" | "checking" | "valid" | "invalid"
@@ -71,14 +68,9 @@ export function CheckoutClient({
   const discountRequestRef = useRef(0);
 
   const emailOk = useMemo(() => isValidCheckoutEmail(email), [email]);
-  const githubUsernameOk = useMemo(
-    () => !requiresGitHubUsername || isValidGitHubUsername(githubUsername),
-    [githubUsername, requiresGitHubUsername],
-  );
-  const checkoutDetailsOk = emailOk && githubUsernameOk;
   const discountOk = !discountCode.trim() || discountStatus === "valid";
   const paymentReady =
-    checkoutDetailsOk && discountOk && discountStatus !== "checking";
+    emailOk && discountOk && discountStatus !== "checking";
   const isFreePurchase = pricing.total === 0;
   const isForeverFreeSubscription =
     isSubscription && isFreePurchase && !discountPeriods;
@@ -154,8 +146,6 @@ export function CheckoutClient({
         productId,
         customerEmail: email.trim(),
         customerName: name.trim() || undefined,
-        githubUsername:
-          requiresGitHubUsername ? githubUsername.trim() : undefined,
         discountCode:
           discountStatus === "valid"
             ? discountCode.trim() || undefined
@@ -180,8 +170,6 @@ export function CheckoutClient({
         productId,
         customerEmail: email.trim(),
         customerName: name.trim() || undefined,
-        githubUsername:
-          requiresGitHubUsername ? githubUsername.trim() : undefined,
         discountCode:
           discountStatus === "valid"
             ? discountCode.trim() || undefined
@@ -239,23 +227,6 @@ export function CheckoutClient({
           />
           Send me product updates and offers from this store.
         </label>
-
-        {requiresGitHubUsername && (
-          <Input
-            label="GitHub username"
-            name="githubUsername"
-            value={githubUsername}
-            onChange={(event) => setGitHubUsername(event.target.value)}
-            placeholder="octocat"
-            autoComplete="off"
-            required
-            error={
-              touched && !githubUsernameOk
-                ? "Enter a valid GitHub username"
-                : undefined
-            }
-          />
-        )}
 
         {!discountVisible ? (
           <button
@@ -389,9 +360,6 @@ export function CheckoutClient({
                 productId={productId}
                 customerEmail={email.trim()}
                 customerName={name.trim() || undefined}
-                githubUsername={
-                  requiresGitHubUsername ? githubUsername.trim() : undefined
-                }
                 discountCode={
                   discountStatus === "valid"
                     ? discountCode.trim() || undefined
@@ -438,9 +406,6 @@ export function CheckoutClient({
                 productId={productId}
                 customerEmail={email.trim()}
                 customerName={name.trim() || undefined}
-                githubUsername={
-                  requiresGitHubUsername ? githubUsername.trim() : undefined
-                }
                 discountCode={
                   discountStatus === "valid"
                     ? discountCode.trim() || undefined
@@ -462,9 +427,6 @@ export function CheckoutClient({
                 productId={productId}
                 customerEmail={email.trim()}
                 customerName={name.trim() || undefined}
-                githubUsername={
-                  requiresGitHubUsername ? githubUsername.trim() : undefined
-                }
                 discountCode={
                   discountStatus === "valid"
                     ? discountCode.trim() || undefined

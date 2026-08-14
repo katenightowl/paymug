@@ -9,7 +9,6 @@ export interface CheckoutClientProps {
   stripeEnabled: boolean;
   mode: "sandbox" | "live";
   currency: string;
-  requiresGitHubUsername: boolean;
   /** Recurring product subscription checkout. */
   isSubscription?: boolean;
   billingSummary?: string | null;
@@ -33,7 +32,6 @@ export interface CompleteFreePurchaseInput {
   productId: string;
   customerEmail: string;
   customerName?: string;
-  githubUsername?: string;
   discountCode?: string;
   affiliateCode?: string;
   marketingOptIn?: boolean;

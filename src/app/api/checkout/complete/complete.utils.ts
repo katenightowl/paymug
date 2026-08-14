@@ -15,7 +15,6 @@ import {
   findUserById,
 } from "@/lib/db";
 import { createFeatureRecord } from "@/lib/feature-records";
-import { validateGitHubBuyerUsername } from "@/lib/github-products";
 import { notifyPaymentReceived } from "@/lib/notification-events";
 import { calculateCheckoutPricing } from "@/lib/product-pricing";
 import { sendStoreOrderPaymentEmail } from "@/lib/store-notification-emails";
@@ -36,24 +35,6 @@ export async function completeFreePurchase(
   }
   const seller = await findUserById(product.userId);
   if (!seller) throw new Error("Product owner not found");
-
-  if (
-    product.githubRepoOwner &&
-    product.githubRepoName &&
-    !input.githubUsername
-  ) {
-    throw new Error("GitHub username is required for this product");
-  }
-  const githubUsername =
-    product.githubRepoOwner &&
-    product.githubRepoName &&
-    input.githubUsername
-      ? await validateGitHubBuyerUsername(
-          product.userId,
-          product.storeId,
-          input.githubUsername
-        )
-      : undefined;
 
   const discount = await resolveDiscount(
     product.userId,
@@ -126,7 +107,6 @@ export async function completeFreePurchase(
     gateway: "free",
     createdAt: paidAt,
     paidAt,
-    githubUsername,
     githubAccessStatus:
       product.githubRepoOwner && product.githubRepoName
         ? "pending"
@@ -153,7 +133,7 @@ export async function completeFreePurchase(
         discountAmount: pricing.discountAmount,
         discountPeriods: null,
         customerName: input.customerName || null,
-        githubUsername: githubUsername || null,
+        githubUsername: null,
         environment: product.environment,
         source: "free_product_checkout",
         orderId: order.id,
