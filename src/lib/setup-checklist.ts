@@ -276,7 +276,7 @@ export const getSetupChecklist = cache(
             complete: sandboxPaidOrder,
             required: false,
             actionLabel: "Open storefront",
-            href: `/s/${storeSlug}`,
+            href: "/",
             external: true,
           },
         ],

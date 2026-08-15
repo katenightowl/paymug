@@ -34,7 +34,7 @@ export default async function StoreSetupPage() {
             Set up your store
           </h1>
           <p className="mt-1 text-sm text-muted">
-            Choose the name and public URL customers will see.
+            Choose the store name customers will see.
           </p>
           <StoreSetupForm />
         </section>

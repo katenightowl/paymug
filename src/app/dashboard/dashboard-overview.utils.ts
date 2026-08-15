@@ -28,7 +28,18 @@ function daysBetween(startDate: string, endDate: string) {
   );
 }
 
-function formatBucketLabel(startDate: string, endDate: string) {
+function formatBucketLabel(
+  startDate: string,
+  endDate: string,
+  interval: DashboardInterval
+) {
+  if (interval === "monthly") {
+    return toDate(startDate).toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  }
   const start = toDate(startDate).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -48,20 +59,26 @@ function createBuckets(
   endDate: string,
   interval: DashboardInterval
 ): DashboardSeriesBucket[] {
-  const step = interval === "weekly" ? 7 : 1;
   const buckets: DashboardSeriesBucket[] = [];
   let cursor = toDate(startDate);
   const end = toDate(endDate);
 
   while (cursor <= end) {
     const bucketStart = toDateKey(cursor);
-    const candidateEnd = addDays(cursor, step - 1);
+    let candidateEnd: Date;
+    if (interval === "monthly") {
+      candidateEnd = new Date(
+        Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 0, 12)
+      );
+    } else {
+      candidateEnd = addDays(cursor, interval === "weekly" ? 6 : 0);
+    }
     const bucketEnd = candidateEnd > end ? end : candidateEnd;
     const bucketEndKey = toDateKey(bucketEnd);
     buckets.push({
       startDate: bucketStart,
       endDate: bucketEndKey,
-      label: formatBucketLabel(bucketStart, bucketEndKey),
+      label: formatBucketLabel(bucketStart, bucketEndKey, interval),
       value: 0,
     });
     cursor = addDays(bucketEnd, 1);
@@ -83,11 +100,13 @@ function addValueToBucket(
 }
 
 function toChartPoints(buckets: DashboardSeriesBucket[]) {
-  return buckets.map((bucket) => ({
-    label: bucket.label,
-    value: bucket.value,
-    date: bucket.startDate,
-  }));
+  return [...buckets]
+    .sort((left, right) => left.startDate.localeCompare(right.startDate))
+    .map((bucket) => ({
+      label: bucket.label,
+      value: bucket.value,
+      date: bucket.startDate,
+    }));
 }
 
 function getPreviousRange(startDate: string, endDate: string) {

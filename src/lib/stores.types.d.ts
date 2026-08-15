@@ -1,7 +1,6 @@
 export interface CreateStoreInput {
   userId: string;
   name: string;
-  slug: string;
   description?: string;
   logoImageUrl?: string;
   coverImageUrl?: string;
@@ -9,7 +8,6 @@ export interface CreateStoreInput {
 
 export interface UpdateStoreInput {
   name?: string;
-  slug?: string;
   description?: string;
   logoImageUrl?: string | null;
   coverImageUrl?: string | null;

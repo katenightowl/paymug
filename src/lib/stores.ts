@@ -84,6 +84,14 @@ export async function getActiveStoreForUser(
   return row ? rowToStore(row) : undefined;
 }
 
+export async function getPrimaryStore(): Promise<Store | undefined> {
+  const db = await getDb();
+  const row = await db.query.stores.findFirst({
+    orderBy: [asc(stores.createdAt)],
+  });
+  return row ? rowToStore(row) : undefined;
+}
+
 export async function getStoreBySlug(
   slug: string
 ): Promise<Store | undefined> {
@@ -100,14 +108,12 @@ export async function createStore(
   const db = await getDb();
   const userStore = await getActiveStoreForUser(input.userId);
   if (userStore) throw new Error("Your account already has a store");
-  const existing = await getStoreBySlug(input.slug);
-  if (existing) throw new Error("Store URL already taken");
   const now = new Date().toISOString();
   const store: Store = {
     id: uid(),
     userId: input.userId,
     name: input.name,
-    slug: input.slug,
+    slug: `store-${input.userId}`,
     description: input.description || "",
     logoImageUrl: input.logoImageUrl,
     coverImageUrl: input.coverImageUrl,
@@ -155,17 +161,10 @@ export async function updateStore(
   input: UpdateStoreInput
 ): Promise<Store | undefined> {
   const db = await getDb();
-  if (input.slug) {
-    const existing = await getStoreBySlug(input.slug);
-    if (existing && existing.id !== storeId) {
-      throw new Error("Store URL already taken");
-    }
-  }
   await db
     .update(stores)
     .set({
       ...(input.name !== undefined ? { name: input.name } : {}),
-      ...(input.slug !== undefined ? { slug: input.slug } : {}),
       ...(input.description !== undefined
         ? { description: input.description }
         : {}),

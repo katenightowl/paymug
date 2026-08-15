@@ -8,7 +8,6 @@ import type { CreateStoreResponse } from "./StoreSetupForm.types";
 export function StoreSetupForm() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +20,7 @@ export function StoreSetupForm() {
       const response = await fetch("/api/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, slug: slug || name }),
+        body: JSON.stringify({ name }),
       });
       const data = (await response.json()) as CreateStoreResponse;
       if (!response.ok) {
@@ -50,13 +49,6 @@ export function StoreSetupForm() {
         onChange={(event) => setName(event.target.value)}
         placeholder="Acme Digital"
         required
-      />
-      <Input
-        label="Store URL"
-        name="slug"
-        value={slug}
-        onChange={(event) => setSlug(event.target.value)}
-        placeholder={name || "acme-digital"}
       />
       <p className="text-sm text-muted">
         You can update these details and connect your payment gateway later.

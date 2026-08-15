@@ -11,6 +11,7 @@ export const dashboardFeatureKeys: DashboardFeatureKey[] = [
   "affiliate-clicks",
   "affiliate-referrals",
   "affiliate-payouts",
+  "pages",
 ];
 
 export function isDashboardFeatureKey(

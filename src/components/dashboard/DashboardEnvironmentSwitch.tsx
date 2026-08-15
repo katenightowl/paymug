@@ -77,7 +77,7 @@ export function DashboardEnvironmentSwitch({
   const isLive = environment === "live";
 
   return (
-    <div className="mx-6 shrink-0 border-t border-[#e8e8ee] pb-2 pt-3.5">
+    <div className="mx-6 py-2">
       {error && (
         <div
           className="mb-2.5 flex items-start gap-1.5 rounded-lg bg-[#fff0f4] px-2.5 py-2 text-sm leading-snug text-[#c93757]"

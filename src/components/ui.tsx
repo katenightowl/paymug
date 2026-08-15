@@ -116,9 +116,6 @@ export function EmptyState({
 }) {
   return (
     <div className={`${cardClass} flex flex-col items-center px-6 py-14 text-center`}>
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-xl">
-        🍋
-      </div>
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="mt-1 max-w-sm text-sm text-muted">{description}</p>
       {action && <div className="mt-5">{action}</div>}

@@ -12,18 +12,13 @@ export default async function CustomerLoginPage({
   const query = await searchParams;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10">
+    <main className="min-h-screen bg-background px-4 py-10 mx-auto max-w-lg">
       <div className="mx-auto max-w-4xl">
-        <Logo />
-        <div className="mt-10">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Customer portal
-          </h1>
-          <p className="mt-2 text-base text-muted">
-            Access your purchases, licenses, repository access, and
-            subscriptions.
-          </p>
-        </div>
+        <Logo label="Customer Portal" />
+
+        <p className="mt-2 text-sm text-muted">
+          Access your purchases, licenses, repository access, and subscriptions.
+        </p>
         {query.error && (
           <div className="mt-6">
             <Alert>

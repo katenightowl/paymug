@@ -1,13 +1,11 @@
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
-import { slugify } from "@/lib/format";
 import { updateStore } from "@/lib/stores";
 import { jsonError } from "@/lib/utils";
 import type { StoreRouteProps } from "./route.types";
 
 const updateStoreSchema = z.object({
   name: z.string().trim().min(1).max(80),
-  slug: z.string().trim().min(1).max(80),
   description: z.string().trim().max(1000),
   logoImageUrl: z
     .string()
@@ -26,6 +24,7 @@ const updateStoreSchema = z.object({
     .refine(
       (value) =>
         value === "" ||
+        value.startsWith("/api/product-files/image?key=") ||
         value.startsWith("data:image/jpeg;base64,") ||
         value.startsWith("data:image/png;base64,") ||
         value.startsWith("data:image/webp;base64,"),
@@ -56,13 +55,10 @@ export async function PATCH(
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message || "Invalid store");
   }
-  const slug = slugify(parsed.data.slug);
-  if (!slug) return jsonError("Store URL is invalid");
   try {
     const { id } = await params;
     const store = await updateStore(id, user.id, {
       name: parsed.data.name,
-      slug,
       description: parsed.data.description,
       logoImageUrl: parsed.data.logoImageUrl || null,
       coverImageUrl: parsed.data.coverImageUrl || null,

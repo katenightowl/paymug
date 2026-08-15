@@ -111,6 +111,8 @@ export default async function DashboardPage({
           name: product.name,
         }))}
         earliestDate={earliestDate}
+        metricGroups={overview.metricGroups}
+        defaultMetricKey={overview.primary.key}
       />
 
       {!(store?.paymentGateway === "stripe" ? stripe : paypal) && (

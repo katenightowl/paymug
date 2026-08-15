@@ -17,7 +17,7 @@ export const labelClass =
   "mb-1.5 block text-sm font-medium text-foreground";
 
 export const cardClass =
-  "rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(20,18,11,0.04)]";
+  "rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(20,18,11,0.04)]";
 
 export const badgeBaseClass =
   "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium";

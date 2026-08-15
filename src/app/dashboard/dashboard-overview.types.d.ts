@@ -2,7 +2,7 @@ import type { FeatureRecord } from "@/lib/feature-records.types";
 import type { Order, Product } from "@/lib/types";
 import type { ChartPoint } from "@/components/dashboard/charts.types";
 
-export type DashboardInterval = "daily" | "weekly";
+export type DashboardInterval = "daily" | "weekly" | "monthly";
 
 export interface DashboardOverviewSearchParams {
   start?: string;
@@ -24,6 +24,18 @@ export type DashboardFilterPreference = DashboardFilterState;
 export interface DashboardFilterProps extends DashboardFilterState {
   products: Array<Pick<Product, "id" | "name">>;
   earliestDate?: string;
+}
+
+export interface DashboardOverviewFiltersProps extends DashboardFilterProps {
+  metricGroups: DashboardMetricGroup[];
+  defaultMetricKey: string;
+}
+
+export interface DashboardShareButtonProps {
+  startDate: string;
+  endDate: string;
+  interval: DashboardInterval;
+  productId: string;
 }
 
 export interface DashboardCalendarProps {

@@ -1,22 +1,21 @@
+<img src="public/favicon.png" height="68" width="68" />
+
 # Paymug
 
-A **Lemon Squeezy–style** platform for selling digital products — with one key difference: **merchants connect their own payment gateway**. Payments go straight to the seller. PayPal ships first; more providers can plug into the same architecture.
+A self-hosted platform for selling digital products where **merchants connect their own payment gateway**. Payments go straight to the seller. PayPal ships first; more providers can plug into the same architecture.
+
+Built with OpenNext (Next.js 16), Tailwind CSS, **Cloudflare D1** (SQLite) with  **Drizzle ORM**
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/hieunc229/paymug)
 
 ## Features
 
-- **Store accounts** — sign up, name your store, public storefront at `/s/{slug}`
-- **Products** — create, draft/publish, price, delivery content after purchase
-- **PayPal BYO** — sellers paste Client ID + Secret (sandbox or live); credentials are verified via OAuth and stored encrypted
-- **Hosted checkout** — `/buy/{productId}` with PayPal Smart Buttons using the **seller’s** client ID
-- **Orders dashboard** — paid / pending / failed tracking
-- **Landing + dashboard UI** inspired by modern merchant platforms
-
-## Stack
-
-- Next.js 16 (App Router) + React 19 + Tailwind CSS 4
-- **Cloudflare D1** (SQLite) + **Drizzle ORM**
-- `jose` sessions, `bcryptjs` passwords, AES-256-GCM for PayPal secrets
-- OpenNext for Cloudflare Workers deploy
+- **Sell your way** — storefront, hosted checkout, one-time products, and subscriptions
+- **Get paid directly** — connect PayPal or Stripe with sandbox and live modes
+- **Deliver automatically** — files, license keys, and private GitHub access
+- **Grow sales** — discounts, email campaigns, and affiliates
+- **Run everything in one place** — customers, orders, refunds, analytics, and a buyer portal
+- **Own your stack** — self-host on Cloudflare and extend with API keys
 
 ## Quick start
 
@@ -68,7 +67,7 @@ or Stripe test keys to test purchases.
 1. Sign up → store created  
 2. Connect PayPal  
 3. Create & publish products  
-4. Share `/buy/{id}` or storefront `/s/{slug}`  
+4. Share `/buy/{id}` or the storefront homepage `/`  
 5. Buyer pays **your** PayPal → order marked paid → delivery content shown  
 
 ## API surface (high level)
@@ -118,6 +117,10 @@ request `Host` header.
 4. The `EMAIL` Worker binding is already declared in `wrangler.jsonc`.
 
 ## Deploy (Cloudflare)
+
+Deploy Paymug to your Cloudflare account in one click:
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/hieunc229/paymug)
 
 The Cloudflare resources are intentionally not tied to the demo account. On the
 first deployment, Wrangler provisions a D1 database and R2 bucket in the
@@ -182,5 +185,5 @@ secrets already configured on the Worker.
 
 ## Roadmap ideas
 
-- Stripe / Paddle / Lemon Squeezy as additional gateways
+- Stripe and Paddle as additional gateways
 - Custom domains

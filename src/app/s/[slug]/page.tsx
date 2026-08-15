@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppIcon } from "@/components/dashboard/Icon";
 import { StoreSubscribeForm } from "@/components/StoreSubscribeForm";
+import { StorefrontFooter } from "@/components/StorefrontFooter";
+import { StorefrontNavigation } from "@/components/StorefrontNavigation";
+import { StoreTestModeRibbon } from "@/components/StoreTestModeRibbon";
 import { cardClass } from "@/components/ui.styles";
 import { getSessionUser } from "@/lib/auth";
 import { findUserByStoreSlug, listProductsByUser } from "@/lib/db";
@@ -13,10 +16,11 @@ import {
 } from "@/lib/license-entitlements";
 import { getProductDescriptionPlainText } from "@/components/product-description.utils";
 import { getStoreById } from "@/lib/stores";
+import { listStorePages } from "@/lib/store-pages";
 import { resolveStorefrontEnvironment } from "@/lib/storefront-environment.utils";
-import Powered from "@/components/PoweredBy";
 import { generateStorefrontMetadata } from "./page.utils";
 import type { StorefrontPageProps } from "./page.types";
+import clsx from "clsx";
 
 export const generateMetadata = generateStorefrontMetadata;
 
@@ -30,68 +34,64 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
     seller.environment,
     viewer?.id,
   );
-  const [store, allProducts] = await Promise.all([
+  const [store, allProducts, storePages] = await Promise.all([
     getStoreById(seller.activeStoreId, seller.id),
     listProductsByUser(seller.id, seller.activeStoreId, environment),
+    listStorePages(seller.id, seller.activeStoreId, environment),
   ]);
   const products = allProducts.filter((p) => p.status === "published");
+  const publishedPages = storePages.filter(
+    (page) => page.status === "published",
+  );
+  const topPages = publishedPages.filter((page) => page.navigation === "top");
+  const footerPages = publishedPages.filter(
+    (page) => page.navigation === "footer",
+  );
   const isTestMode = environment === "sandbox";
 
   return (
     <div className="flex min-h-screen flex-col">
-      {isTestMode && (
-        <div className="bg-amber-300 px-6 py-2 text-center text-sm text-amber-950">
-          Test mode — you are viewing sandbox store data. Customers still see
-          the live store.
-        </div>
-      )}
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12">
+      {isTestMode && <StoreTestModeRibbon />}
+      <main className="mx-auto w-full max-w-5xl flex-1 p-4 pb-12">
         {seller.storeCoverImageUrl && (
           <img
             src={seller.storeCoverImageUrl}
             alt={`${seller.storeName} store cover`}
-            className="mb-8 aspect-[3/1] w-full rounded-2xl object-cover"
+            className="aspect-[4/1] w-full rounded-2xl object-cover"
           />
         )}
-        <header className="flex flex-col justify-between gap-8 sm:flex-row sm:items-start">
-          <div className="flex max-w-xl flex-col items-start">
-            {store?.logoImageUrl ? (
-              <img
-                src={store.logoImageUrl}
-                alt={`${store.name} logo`}
-                className="h-12 w-12 rounded-xl object-cover"
-              />
-            ) : (
-              <AppIcon size={48} />
-            )}
-            <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              {seller.storeName}
-            </h1>
-            <p className="mt-2 whitespace-pre-line text-muted">
-              {store?.description || `Digital products from ${seller.name}`}
-            </p>
-          </div>
-          <nav
-            className="flex flex-rows items-end gap-6"
-            aria-label="Store navigation"
-          >
-            <Link
-              href="/customer/login"
-              className="text-sm font-medium text-foreground hover:underline"
-            >
-              Customer Portal
-            </Link>
 
-            {store?.affiliatesEnabled && (
-              <Link
-                href={`/s/${slug}/affiliates`}
-                className="text-sm font-medium text-foreground hover:underline"
-              >
-                Affiliate Program
-              </Link>
-            )}
-          </nav>
+        <header
+          className={`relative flex flex-col items-center text-center ${
+            seller.storeCoverImageUrl ? "-mt-6" : ""
+          }`}
+        >
+          {store?.logoImageUrl ? (
+            <img
+              src={store.logoImageUrl}
+              alt={`${store.name} logo`}
+              className="h-16 w-16 rounded-xl object-cover ring-4 ring-white"
+            />
+          ) : (
+            <div className="rounded-xl ring-4 ring-white">
+              <AppIcon size={48} />
+            </div>
+          )}
+          <h1 className="mt-4 text-3xl font-bold tracking-tight">
+            {seller.storeName}
+          </h1>
+          <p className="mt-2 max-w-xl whitespace-pre-line text-muted">
+            {store?.description || `Digital products from ${seller.name}`}
+          </p>
+          <div className={clsx("mt-4 [&_nav]:justify-center", cardClass)}>
+            <StorefrontNavigation
+              pages={topPages}
+              affiliatesEnabled={store?.affiliatesEnabled ?? false}
+              showDashboard={viewer?.id === seller.id}
+            />
+          </div>
         </header>
+
 
         {products.length === 0 ? (
           <div
@@ -105,20 +105,20 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
               <Link
                 key={p.id}
                 href={`/buy/${p.id}${isTestMode ? "?preview" : ""}`}
-                className={`${cardClass} group flex flex-col p-5 transition hover:border-accent/50 hover:shadow-md`}
+                className={`group flex flex-col transition shadow-gray-300/20`}
               >
                 {p.imageUrl ? (
                   <img
                     src={p.imageUrl}
                     alt={p.name}
-                    className="aspect-[16/9] w-full rounded-xl object-cover"
+                    className="aspect-[16/9] w-full object-cover rounded-md"
                   />
                 ) : (
-                  <div className="flex h-28 items-center justify-center rounded-xl bg-accent-soft text-3xl">
+                  <div className="flex h-28 items-center justify-center bg-accent-soft text-3xl">
                     📦
                   </div>
                 )}
-                <h2 className="mt-4 font-semibold group-hover:underline">
+                <h2 className="mt-4 font-semibold group-hover:text-accent-dark">
                   {p.name}
                 </h2>
                 <p className="mt-1 line-clamp-2 flex-1 text-sm text-muted">
@@ -131,10 +131,12 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
                 </p>
                 {isPerpetualLicenseProduct(p) && (
                   <p className="mt-1 text-xs text-muted">
-                    Lifetime use · {formatLicenseUpdatePeriodLabel(
+                    Lifetime use ·{" "}
+                    {formatLicenseUpdatePeriodLabel(
                       p.licenseUpdatePeriodUnit || "year",
                       p.licenseUpdatePeriodCount,
-                    )} of updates
+                    )}{" "}
+                    of updates
                   </p>
                 )}
               </Link>
@@ -142,21 +144,9 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
           </div>
         )}
 
-        <section className={`${cardClass} mt-10 p-6 sm:p-8`}>
-          <div className="max-w-xl">
-            <h2 className="text-lg font-semibold">Store updates</h2>
-            <p className="mt-1 text-sm text-muted">
-              Get new product announcements and offers from {seller.storeName}.
-            </p>
-          </div>
-          <div className="mt-5 max-w-xl">
-            <StoreSubscribeForm storeSlug={seller.storeSlug} />
-          </div>
-        </section>
+        <StoreSubscribeForm storeSlug={seller.storeSlug} />
       </main>
-      <footer className="border-t border-border bg-card">
-        <Powered storeSlug={seller.storeSlug} />
-      </footer>
+      <StorefrontFooter pages={footerPages} />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 export interface StoreSettingsFormProps {
   storeId: string;
   initialName: string;
-  initialSlug: string;
   initialDescription: string;
   initialLogoImageUrl?: string;
   initialCoverImageUrl?: string;

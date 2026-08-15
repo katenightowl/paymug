@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AreaChart } from "@/components/dashboard/charts";
 import { CustomSelect } from "@/components/CustomSelect";
 import { DeltaLine } from "./DashboardOverviewControls";
+import { DashboardGraphShareButton } from "./DashboardGraphShareButton";
 import { formatDashboardMetricValue } from "./dashboard-metric-chart.utils";
 import type { DashboardMetricChartProps } from "./dashboard-overview.types";
 
@@ -22,7 +23,12 @@ export function DashboardMetricChart({
   if (!metric) return null;
 
   return (
-    <article className="flex min-h-72 flex-col border-b border-[#e8e8ee] p-6 lg:border-r lg:nth-[3n]:border-r-0 text-sm">
+    <article className="group relative flex min-h-72 flex-col border-b border-[#e8e8ee] p-6 lg:border-r lg:nth-[3n]:border-r-0 text-sm">
+      <DashboardGraphShareButton
+        metric={metric}
+        currency={currency}
+        className="right-5 top-5"
+      />
       <div className="flex items-center gap-3">
         <CustomSelect
           value={metric.key}

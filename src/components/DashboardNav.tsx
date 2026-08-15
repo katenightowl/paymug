@@ -26,10 +26,11 @@ import {
   isDashboardNavItemActive,
 } from "./dashboard-nav.utils";
 import type { DashboardNavProps } from "./DashboardNav.types";
+import clsx from "clsx";
+import { cardClass } from "./ui.styles";
 
 export function DashboardNav({
   storeName,
-  storeSlug,
   userName,
   environment,
   environmentAvailability,
@@ -121,14 +122,18 @@ export function DashboardNav({
           </Link>
         </nav>
 
-
-
         <DashboardEnvironmentSwitch
           environment={environment}
           availability={environmentAvailability}
         />
 
-        <div className="relative mx-6 flex shrink-0 items-center justify-between gap-3 border-t border-[#e8e8ee] pb-4 pt-2">
+
+        <div
+          className={clsx(
+            "relative mx-4 flex shrink-0 items-center justify-between gap-3 border-t border-[#e8e8ee] py-2 px-4 mb-4",
+            cardClass,
+          )}
+        >
           {accountMenuOpen && (
             <div className="absolute bottom-full left-0 z-30 mb-2 w-full overflow-hidden rounded-xl border border-[#e8e8ee] bg-white py-2 shadow-xl">
               <div className="px-1">
@@ -143,16 +148,15 @@ export function DashboardNav({
               </div>
             </div>
           )}
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
+          <div>
+            {/* <p className="truncate text-sm font-semibold text-foreground">
               {storeName}
-            </p>
+            </p> */}
             <Link
-              href={`/s/${storeSlug}`}
-              target="_blank"
-              className="mt-0.5 block truncate text-sm text-muted hover:text-accent-hover"
+              href={`/dashboard/settings/store`}
+              className="block truncate text-sm font-medium hover:text-accent-hover"
             >
-              /s/{storeSlug}
+              {storeName}
             </Link>
           </div>
           <button
@@ -165,6 +169,7 @@ export function DashboardNav({
             <DotsThree size={20} weight="bold" aria-hidden />
           </button>
         </div>
+
       </aside>
 
       <header className="row-start-1 border-b border-[#e8e8ee] bg-white lg:hidden">

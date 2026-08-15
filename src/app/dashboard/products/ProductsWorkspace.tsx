@@ -102,7 +102,7 @@ export function ProductsWorkspace({
                         </span>
                       )}
                       <span
-                        className={`absolute left-1 top-1 flex h-7 w-7 items-center justify-center rounded-md bg-white shadow-sm ring-1 ring-black/5 transition-opacity ${
+                        className={`absolute left-0 top-3 flex items-center justify-center rounded-md ring-1 ring-black/5 transition-opacity ${
                           selection.hasSelection
                             ? "opacity-100"
                             : "opacity-0 group-hover:opacity-100"

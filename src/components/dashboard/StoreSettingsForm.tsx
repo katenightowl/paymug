@@ -5,11 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppIcon } from "@/components/dashboard/Icon";
+import { uploadProductCoverImage } from "@/components/product-form.utils";
 import { Alert, Button, Input, Select, Textarea } from "@/components/ui";
-import {
-  readStoreCoverFile,
-  readStoreLogoFile,
-} from "./store-cover.utils";
+import { readStoreLogoFile } from "./store-cover.utils";
 import type {
   StoreSettingsFormProps,
   StoreSettingsResponse,
@@ -19,7 +17,6 @@ import type {
 export function StoreSettingsForm({
   storeId,
   initialName,
-  initialSlug,
   initialDescription,
   initialLogoImageUrl,
   initialCoverImageUrl,
@@ -31,7 +28,6 @@ export function StoreSettingsForm({
 }: StoreSettingsFormProps) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
-  const [slug, setSlug] = useState(initialSlug);
   const [description, setDescription] = useState(initialDescription);
   const [logoImageUrl, setLogoImageUrl] = useState(initialLogoImageUrl || "");
   const [coverImageUrl, setCoverImageUrl] = useState(
@@ -50,6 +46,7 @@ export function StoreSettingsForm({
     (initialTransactionFeeValue / 100).toFixed(2),
   );
   const [saving, setSaving] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -57,14 +54,18 @@ export function StoreSettingsForm({
     const file = event.target.files?.[0];
     if (!file) return;
     setError(null);
+    setCoverUploading(true);
     try {
-      setCoverImageUrl(await readStoreCoverFile(file));
+      setCoverImageUrl(await uploadProductCoverImage(file));
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
           ? uploadError.message
-          : "Could not read cover image"
+          : "Could not upload cover image"
       );
+    } finally {
+      setCoverUploading(false);
+      event.target.value = "";
     }
   }
 
@@ -111,7 +112,6 @@ export function StoreSettingsForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name,
-        slug,
         description,
         logoImageUrl,
         coverImageUrl,
@@ -140,7 +140,7 @@ export function StoreSettingsForm({
     >
       <section className="relative min-h-full min-w-0 flex-1 lg:sticky lg:top-0 lg:self-start">
         <Link
-          href={`/s/${slug}`}
+          href="/"
           target="_blank"
           className="absolute right-4 top-4 z-10 rounded-lg bg-white/90 px-3 py-2 text-sm font-medium text-accent-dark shadow-sm backdrop-blur hover:underline"
         >
@@ -164,7 +164,11 @@ export function StoreSettingsForm({
             )}
             <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-lg bg-white/90 px-3 py-2 text-sm font-medium text-foreground shadow-sm backdrop-blur transition group-hover:bg-white">
               <ImageSquare size={17} />
-              {coverImageUrl ? "Replace cover" : "Upload cover"}
+              {coverUploading
+                ? "Uploading…"
+                : coverImageUrl
+                  ? "Replace cover"
+                  : "Upload cover"}
             </span>
           </label>
           <input
@@ -172,6 +176,7 @@ export function StoreSettingsForm({
             type="file"
             accept="image/jpeg,image/png,image/webp"
             onChange={selectCover}
+            disabled={coverUploading}
             className="sr-only"
           />
           {coverImageUrl && (
@@ -185,53 +190,56 @@ export function StoreSettingsForm({
             </button>
           )}
         </div>
-        <div className="p-5">
-          <div className="flex items-start gap-3">
-            <div className="relative shrink-0">
-              <label
-                htmlFor="store-logo"
-                className="group grid h-14 w-14 cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-[#f7f7f8] text-muted"
-                aria-label={logoImageUrl ? "Replace store logo" : "Upload store logo"}
-              >
-                {logoImageUrl ? (
-                  <img
-                    src={logoImageUrl}
-                    alt="Store logo preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <AppIcon size={32} />
-                )}
-                <span className="absolute inset-0 grid place-items-center bg-black/35 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
-                  {logoImageUrl ? "Replace" : "Upload"}
-                </span>
-              </label>
-              <input
-                id="store-logo"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={selectLogo}
-                className="sr-only"
-              />
-              {logoImageUrl && (
-                <button
-                  type="button"
-                  onClick={() => setLogoImageUrl("")}
-                  className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-white text-red-600 shadow-sm"
-                  aria-label="Remove store logo"
-                >
-                  <Trash size={12} />
-                </button>
+        <div
+          className={`relative flex flex-col items-center px-5 text-center ${
+            coverImageUrl ? "-mt-7" : "mt-5"
+          }`}
+        >
+          <div className="relative shrink-0">
+            <label
+              htmlFor="store-logo"
+              className={`group grid h-14 w-14 cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-[#f7f7f8] text-muted ${
+                coverImageUrl ? "ring-4 ring-white" : ""
+              }`}
+              aria-label={logoImageUrl ? "Replace store logo" : "Upload store logo"}
+            >
+              {logoImageUrl ? (
+                <img
+                  src={logoImageUrl}
+                  alt="Store logo preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <AppIcon size={32} />
               )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xl font-semibold">{name || "Store name"}</p>
-              <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-muted">
-                {description || "Add a description for your store."}
-              </p>
-              <p className="mt-2 text-xs text-muted">/s/{slug || "store"}</p>
-            </div>
+              <span className="absolute inset-0 grid place-items-center bg-black/35 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
+                {logoImageUrl ? "Replace" : "Upload"}
+              </span>
+            </label>
+            <input
+              id="store-logo"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={selectLogo}
+              className="sr-only"
+            />
+            {logoImageUrl && (
+              <button
+                type="button"
+                onClick={() => setLogoImageUrl("")}
+                className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-white text-red-600 shadow-sm"
+                aria-label="Remove store logo"
+              >
+                <Trash size={12} />
+              </button>
+            )}
           </div>
+          <p className="mt-4 text-xl font-semibold">{name || "Store name"}</p>
+          <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-muted">
+            {description || "Add a description for your store."}
+          </p>
+        </div>
+        <div className="p-5">
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="h-20 rounded-xl bg-[#f7f7f8]" />
             <div className="h-20 rounded-xl bg-[#f7f7f8]" />
@@ -245,13 +253,6 @@ export function StoreSettingsForm({
           name="storeName"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          required
-        />
-        <Input
-          label="Store URL"
-          name="storeSlug"
-          value={slug}
-          onChange={(event) => setSlug(event.target.value)}
           required
         />
         <Input
@@ -330,7 +331,11 @@ export function StoreSettingsForm({
         {error && <Alert>{error}</Alert>}
         {success && <Alert variant="success">Store saved.</Alert>}
         <div className="sticky bottom-0 bg-white py-3">
-          <Button type="submit" disabled={saving} className="w-full py-3">
+          <Button
+            type="submit"
+            disabled={saving || coverUploading}
+            className="w-full py-3"
+          >
             {saving ? "Saving…" : "Update"}
           </Button>
         </div>

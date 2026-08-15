@@ -5,7 +5,6 @@ import type { PayPalMode } from "@/lib/types";
 
 export interface DashboardNavProps {
   storeName: string;
-  storeSlug: string;
   userName: string;
   environment: PayPalMode;
   environmentAvailability: PayPalEnvironmentAvailability;

@@ -51,7 +51,6 @@ export default async function DashboardLayout({
     <div className="grid min-h-dvh grid-cols-[minmax(0,1fr)] grid-rows-[auto_auto_minmax(0,1fr)] overflow-x-clip bg-white text-[#333] [--background:#fff] [--border:#e8e8ee] [--card:#fff] [--foreground:#27272f] [--muted:#85859d] lg:grid-cols-[15rem_minmax(0,1fr)] lg:grid-rows-[5.5rem_minmax(0,1fr)]">
       <DashboardNav
         storeName={user.storeName}
-        storeSlug={user.storeSlug}
         userName={user.name}
         environment={environmentState.active}
         environmentAvailability={environmentState.availability}

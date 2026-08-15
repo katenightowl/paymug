@@ -48,7 +48,9 @@ export async function PATCH(
   const user = await getSessionUser();
   if (!user) return jsonError("Unauthorized", 401);
   const { feature, id } = await params;
-  if (!isDashboardFeatureKey(feature)) return jsonError("Not found", 404);
+  if (!isDashboardFeatureKey(feature) || feature === "pages") {
+    return jsonError("Not found", 404);
+  }
 
   const existing = await findFeatureRecord(id, user.id);
   if (
@@ -280,7 +282,9 @@ export async function DELETE(
   const user = await getSessionUser();
   if (!user) return jsonError("Unauthorized", 401);
   const { feature, id } = await params;
-  if (!isDashboardFeatureKey(feature)) return jsonError("Not found", 404);
+  if (!isDashboardFeatureKey(feature) || feature === "pages") {
+    return jsonError("Not found", 404);
+  }
 
   const existing = await findFeatureRecord(id, user.id);
   if (

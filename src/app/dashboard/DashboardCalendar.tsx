@@ -31,7 +31,7 @@ export function DashboardCalendar({
               key={day.date}
               type="button"
               onClick={() => onSelect(day.date)}
-              className={`h-10 text-sm transition ${
+              className={`h-10 text-xs transition ${
                 !day.inMonth
                   ? "text-transparent pointer-events-none"
                   : isEndpoint

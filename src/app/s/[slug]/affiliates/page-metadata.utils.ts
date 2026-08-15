@@ -11,6 +11,12 @@ export async function generateAffiliateProgramMetadata({
   params,
 }: AffiliateProgramPageProps): Promise<Metadata> {
   const { slug } = await params;
+  return buildAffiliateProgramMetadata(slug);
+}
+
+export async function buildAffiliateProgramMetadata(
+  slug: string,
+): Promise<Metadata> {
   const store = await getStoreBySlug(slug);
   if (!store?.affiliatesEnabled) {
     return {
@@ -23,7 +29,7 @@ export async function generateAffiliateProgramMetadata({
   return buildPublicPageMetadata({
     title: `Join the ${store.name} Affiliate Program`,
     description,
-    canonicalPath: `/s/${encodeURIComponent(slug)}/affiliates`,
+    canonicalPath: "/affiliates",
     siteName: store.name,
     imageUrl: getStoreSocialImagePath(slug),
     imageAlt: `${store.name} affiliate program`,

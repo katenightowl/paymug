@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductDescription } from "@/components/ProductDescription";
+import { StoreTestModeRibbon } from "@/components/StoreTestModeRibbon";
 import { cardClass } from "@/components/ui.styles";
 import { getSessionUser } from "@/lib/auth";
 import { findProductById, findUserById } from "@/lib/db";
@@ -76,16 +77,14 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      {isPreview && (
+      {isPreview && !isSandbox && (
         <div className="bg-amber-100 px-6 py-2 text-center text-sm text-amber-900">
           Preview — this is a{" "}
           {product.environment === "sandbox" ? "test" : "draft"} product
         </div>
       )}
       {isSandbox && (
-        <div className="px-6 py-2 bg-amber-300 text-sm text-center">
-          This store is still in sandbox mode
-        </div>
+        <StoreTestModeRibbon />
       )}
 
       <main className="mx-auto grid max-w-5xl px-4 pb-10 pt-5 lg:grid-cols-5">
@@ -95,7 +94,7 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
               <div className="flex h-8 items-center">
                 <Link
                   className="flex flex-row items-end gap-2"
-                  href={`/s/${store.slug}`}
+                  href="/"
                   aria-label={`${store.name} store`}
                 >
                   {store.logoImageUrl && (

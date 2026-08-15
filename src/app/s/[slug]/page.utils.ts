@@ -11,6 +11,16 @@ export async function generateStorefrontMetadata({
   params,
 }: StorefrontPageProps): Promise<Metadata> {
   const { slug } = await params;
+  return buildStorefrontMetadata(
+    slug,
+    "/",
+  );
+}
+
+export async function buildStorefrontMetadata(
+  slug: string,
+  canonicalPath: string,
+): Promise<Metadata> {
   const seller = await findUserByStoreSlug(slug);
   if (!seller) {
     return {
@@ -27,7 +37,7 @@ export async function generateStorefrontMetadata({
   return buildPublicPageMetadata({
     title: `${storeName} — Digital Products`,
     description,
-    canonicalPath: `/s/${encodeURIComponent(slug)}`,
+    canonicalPath,
     siteName: storeName,
     imageUrl: getStoreSocialImagePath(slug),
     imageAlt: `${storeName} store`,

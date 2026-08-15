@@ -5,6 +5,25 @@ const nextConfig: NextConfig = {
 		root: process.cwd(),
 	},
 	allowedDevOrigins: ['paymug.dev'],
+	async redirects() {
+		return [
+			{
+				source: "/s/:slug",
+				destination: "/",
+				permanent: true,
+			},
+			{
+				source: "/s/:slug/affiliates",
+				destination: "/affiliates",
+				permanent: true,
+			},
+			{
+				source: "/pages/:slug",
+				destination: "/:slug",
+				permanent: true,
+			},
+		];
+	},
 };
 
 export default nextConfig;
