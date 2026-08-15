@@ -3,16 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert, Button, Input } from "@/components/ui";
-import type { CreateFirstStoreResponse } from "./FirstStoreForm.types";
+import type { CreateStoreResponse } from "./StoreSetupForm.types";
 
-export function FirstStoreForm() {
+export function StoreSetupForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function create(event: React.FormEvent<HTMLFormElement>) {
+  async function setupStore(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
     setError(null);
@@ -21,16 +21,11 @@ export function FirstStoreForm() {
       const response = await fetch("/api/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          slug: slug || name,
-          useCurrentPaymentCredentials: false,
-          useCurrentGitHubCredentials: false,
-        }),
+        body: JSON.stringify({ name, slug: slug || name }),
       });
-      const data = (await response.json()) as CreateFirstStoreResponse;
+      const data = (await response.json()) as CreateStoreResponse;
       if (!response.ok) {
-        throw new Error(data.error || "Could not create store");
+        throw new Error(data.error || "Could not set up store");
       }
       router.push("/dashboard/setup");
       router.refresh();
@@ -38,7 +33,7 @@ export function FirstStoreForm() {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not create store"
+          : "Could not set up store",
       );
     } finally {
       setSaving(false);
@@ -46,7 +41,7 @@ export function FirstStoreForm() {
   }
 
   return (
-    <form onSubmit={create} className="mt-6 space-y-4">
+    <form onSubmit={setupStore} className="mt-6 space-y-4">
       {error && <Alert>{error}</Alert>}
       <Input
         label="Store name"
@@ -64,10 +59,10 @@ export function FirstStoreForm() {
         placeholder={name || "acme-digital"}
       />
       <p className="text-sm text-muted">
-        You can update your store details and connect payments after this step.
+        You can update these details and connect your payment gateway later.
       </p>
       <Button type="submit" className="w-full" disabled={saving}>
-        {saving ? "Creating…" : "Create store"}
+        {saving ? "Setting up…" : "Set up store"}
       </Button>
     </form>
   );

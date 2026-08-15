@@ -112,9 +112,9 @@ export const landingBenefits: LandingBenefit[] = [
   },
   {
     icon: "◆",
-    title: "Multiple stores, one account",
+    title: "Bring your own payment gateway",
     description:
-      "Operate separate storefronts while choosing when to share payment and GitHub credentials across your portfolio.",
+      "Connect your own PayPal or Stripe account and receive customer payments directly through your provider.",
   },
   {
     icon: "◉",

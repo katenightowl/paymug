@@ -40,7 +40,10 @@ export async function POST(req: Request) {
     return Response.json({ user: toPublicUser(user) }, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Signup failed";
-    if (message === "Email already registered") {
+    if (
+      message === "Email already registered" ||
+      message === "This installation already has an account"
+    ) {
       return jsonError(message, 409);
     }
     return jsonError(message, 500);

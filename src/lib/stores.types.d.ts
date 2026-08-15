@@ -5,9 +5,6 @@ export interface CreateStoreInput {
   description?: string;
   logoImageUrl?: string;
   coverImageUrl?: string;
-  currentStoreId?: string;
-  useCurrentPaymentCredentials?: boolean;
-  useCurrentGitHubCredentials?: boolean;
 }
 
 export interface UpdateStoreInput {
