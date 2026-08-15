@@ -18,6 +18,8 @@ const dashboardTitles: Record<string, string> = {
   "/dashboard/settings": "General settings",
   "/dashboard/settings/api-keys": "API keys",
   "/dashboard/settings/about": "About Paymug",
+  "/dashboard/settings/store": "Store",
+  "/dashboard/pages": "Pages"
 };
 
 export function getDashboardTopbarTitle(pathname: string): string {

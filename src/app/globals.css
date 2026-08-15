@@ -1017,3 +1017,8 @@ code, kbd, samp, pre {
 .text-accent-dark {
   color: #9e6e07
 }
+
+.hover:text-accent-dark:hover,
+.group-hover:text-accent-dark:hover {
+  color: #9e6e07
+}

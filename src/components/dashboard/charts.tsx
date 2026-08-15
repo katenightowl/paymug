@@ -65,6 +65,8 @@ export function AreaChart({
   trendPercent,
   locale = "en-US",
   gridEvery,
+  showGrid = true,
+  endpointLabelFontSize,
   className = "",
 }: ChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -259,16 +261,28 @@ export function AreaChart({
 
   const plugins = useMemo<Plugin<"line">[]>(
     () => [
-      createDashedGridPlugin(
-        getChartGridStep(data.length, gridEvery)
-      ),
+      ...(showGrid
+        ? [
+            createDashedGridPlugin(
+              getChartGridStep(data.length, gridEvery)
+            ),
+          ]
+        : []),
       createEndpointLabelsPlugin(
         startLabel,
         endLabel,
-        compact ? 10 : 12
+        endpointLabelFontSize ?? (compact ? 10 : 12)
       ),
     ],
-    [compact, data.length, endLabel, gridEvery, startLabel]
+    [
+      compact,
+      data.length,
+      endLabel,
+      endpointLabelFontSize,
+      gridEvery,
+      showGrid,
+      startLabel,
+    ]
   );
 
   if (!data.length) {

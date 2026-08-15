@@ -1,8 +1,15 @@
-import { getSessionUser } from "@/lib/auth";
-import { LandingPage } from "./LandingPage";
+import { redirect } from "next/navigation";
+import StorefrontPage from "./s/[slug]/page";
+import {
+  generateHomepageMetadata,
+  getHomepageStoreSlug,
+} from "./homepage-storefront.utils";
+
+export const generateMetadata = generateHomepageMetadata;
 
 export default async function HomePage() {
-  const user = await getSessionUser();
+  const slug = await getHomepageStoreSlug();
+  if (!slug) redirect("/setup");
 
-  return <LandingPage isAuthenticated={Boolean(user)} />;
+  return <StorefrontPage params={Promise.resolve({ slug })} />;
 }

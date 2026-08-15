@@ -55,15 +55,6 @@ function rowToStore(row: typeof stores.$inferSelect): Store {
   };
 }
 
-export async function listStoresByUser(userId: string): Promise<Store[]> {
-  const db = await getDb();
-  const rows = await db.query.stores.findMany({
-    where: eq(stores.userId, userId),
-    orderBy: [asc(stores.createdAt)],
-  });
-  return rows.map(rowToStore);
-}
-
 export async function getStoreById(
   storeId: string,
   userId?: string
@@ -85,7 +76,20 @@ export async function getActiveStoreForUser(
     const activeStore = await getStoreById(activeStoreId, userId);
     if (activeStore) return activeStore;
   }
-  return (await listStoresByUser(userId))[0];
+  const db = await getDb();
+  const row = await db.query.stores.findFirst({
+    where: eq(stores.userId, userId),
+    orderBy: [asc(stores.createdAt)],
+  });
+  return row ? rowToStore(row) : undefined;
+}
+
+export async function getPrimaryStore(): Promise<Store | undefined> {
+  const db = await getDb();
+  const row = await db.query.stores.findFirst({
+    orderBy: [asc(stores.createdAt)],
+  });
+  return row ? rowToStore(row) : undefined;
 }
 
 export async function getStoreBySlug(
@@ -102,41 +106,30 @@ export async function createStore(
   input: CreateStoreInput
 ): Promise<Store> {
   const db = await getDb();
-  const existing = await getStoreBySlug(input.slug);
-  if (existing) throw new Error("Store URL already taken");
+  const userStore = await getActiveStoreForUser(input.userId);
+  if (userStore) throw new Error("Your account already has a store");
   const now = new Date().toISOString();
-  const currentStore = input.currentStoreId
-    ? await getStoreById(input.currentStoreId, input.userId)
-    : undefined;
   const store: Store = {
     id: uid(),
     userId: input.userId,
     name: input.name,
-    slug: input.slug,
+    slug: `store-${input.userId}`,
     description: input.description || "",
     logoImageUrl: input.logoImageUrl,
     coverImageUrl: input.coverImageUrl,
-    paymentCredentialSourceStoreId:
-      input.useCurrentPaymentCredentials && currentStore
-        ? currentStore.paymentCredentialSourceStoreId || currentStore.id
-        : undefined,
-    paymentGateway:
-      input.useCurrentPaymentCredentials && currentStore
-        ? currentStore.paymentGateway
-        : "paypal",
-    githubCredentialSourceStoreId:
-      input.useCurrentGitHubCredentials && currentStore
-        ? currentStore.githubCredentialSourceStoreId || currentStore.id
-        : undefined,
+    paymentCredentialSourceStoreId: undefined,
+    paymentGateway: "paypal",
+    githubCredentialSourceStoreId: undefined,
     affiliatesEnabled: true,
     affiliateCommissionType: "percentage",
     affiliateCommissionValue: 10,
     affiliateCommissionDuration: "one_time",
     affiliateAttributionModel: "last_click",
     emailCampaignsEnabled: true,
-    currency: currentStore?.currency || "USD",
-    transactionFeeType: currentStore?.transactionFeeType || "fixed",
-    transactionFeeValue: currentStore?.transactionFeeValue || 0,
+    abandonedCheckoutRemindersEnabled: false,
+    currency: "USD",
+    transactionFeeType: "fixed",
+    transactionFeeValue: 0,
     createdAt: now,
     updatedAt: now,
   };
@@ -151,13 +144,14 @@ export async function createStore(
     githubCredentialSourceStoreId:
       store.githubCredentialSourceStoreId ?? null,
   });
-  await setActiveStore(input.userId, store.id);
-  if (!currentStore) {
-    await db
-      .update(users)
-      .set({ storeName: store.name, storeSlug: store.slug })
-      .where(eq(users.id, input.userId));
-  }
+  await db
+    .update(users)
+    .set({
+      activeStoreId: store.id,
+      storeName: store.name,
+      storeSlug: store.slug,
+    })
+    .where(eq(users.id, input.userId));
   return store;
 }
 
@@ -167,17 +161,10 @@ export async function updateStore(
   input: UpdateStoreInput
 ): Promise<Store | undefined> {
   const db = await getDb();
-  if (input.slug) {
-    const existing = await getStoreBySlug(input.slug);
-    if (existing && existing.id !== storeId) {
-      throw new Error("Store URL already taken");
-    }
-  }
   await db
     .update(stores)
     .set({
       ...(input.name !== undefined ? { name: input.name } : {}),
-      ...(input.slug !== undefined ? { slug: input.slug } : {}),
       ...(input.description !== undefined
         ? { description: input.description }
         : {}),
@@ -225,20 +212,6 @@ export async function updateStore(
     })
     .where(and(eq(stores.id, storeId), eq(stores.userId, userId)));
   return getStoreById(storeId, userId);
-}
-
-export async function setActiveStore(
-  userId: string,
-  storeId: string
-): Promise<boolean> {
-  const db = await getDb();
-  const store = await getStoreById(storeId, userId);
-  if (!store) return false;
-  await db
-    .update(users)
-    .set({ activeStoreId: storeId })
-    .where(eq(users.id, userId));
-  return true;
 }
 
 export async function getStoreCredentialSource(

@@ -48,7 +48,9 @@ export async function GET(
   const user = await getSessionUser();
   if (!user) return jsonError("Unauthorized", 401);
   const { feature } = await params;
-  if (!isDashboardFeatureKey(feature)) return jsonError("Not found", 404);
+  if (!isDashboardFeatureKey(feature) || feature === "pages") {
+    return jsonError("Not found", 404);
+  }
 
   return Response.json({
     records:
@@ -69,7 +71,9 @@ export async function POST(
   const user = await getSessionUser();
   if (!user) return jsonError("Unauthorized", 401);
   const { feature } = await params;
-  if (!isDashboardFeatureKey(feature)) return jsonError("Not found", 404);
+  if (!isDashboardFeatureKey(feature) || feature === "pages") {
+    return jsonError("Not found", 404);
+  }
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) {

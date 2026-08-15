@@ -21,7 +21,7 @@ export async function GET(
     requestedDestination?.startsWith("/") &&
     !requestedDestination.startsWith("//")
       ? requestedDestination
-      : `/s/${storeSlug}`;
+      : "/";
 
   if (!seller) {
     return NextResponse.redirect(await getRuntimeAbsoluteUrl("/", req.url));

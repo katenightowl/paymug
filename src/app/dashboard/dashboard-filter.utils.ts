@@ -52,6 +52,40 @@ export function formatRangeDate(value: string) {
   });
 }
 
+export function getDashboardInterval(
+  startDate: string,
+  endDate: string,
+): DashboardInterval {
+  const days =
+    Math.abs(
+      Math.round(
+        (fromDateKey(endDate).getTime() - fromDateKey(startDate).getTime()) /
+          86_400_000,
+      ),
+    ) + 1;
+  if (days < 7 * 7) return "daily";
+  if (days < 365) return "weekly";
+  return "monthly";
+}
+
+export function formatDashboardPeriodLabel(
+  startDate: string,
+  endDate: string,
+): string {
+  const days =
+    Math.abs(
+      Math.round(
+        (fromDateKey(endDate).getTime() - fromDateKey(startDate).getTime()) /
+          86_400_000,
+      ),
+    ) + 1;
+  if (days === 1) return "Today";
+  if ([7, 14, 30].includes(days)) return `Last ${days} days`;
+  if (days === 90) return "Last 3 months";
+  if (days === 365) return "Last 12 months";
+  return `${formatRangeDate(startDate)} — ${formatRangeDate(endDate)}`;
+}
+
 export function getCalendarDays(month: string) {
   const first = fromDateKey(`${month}-01`);
   const mondayOffset = (first.getUTCDay() + 6) % 7;
@@ -126,12 +160,10 @@ export function parseDashboardFilterState(
     startDate <= endDate
       ? { startDate, endDate }
       : { startDate: endDate, endDate: startDate };
-  const interval: DashboardInterval =
-    params.interval === "weekly"
-      ? "weekly"
-      : saved?.interval === "weekly"
-        ? "weekly"
-        : "daily";
+  const interval = getDashboardInterval(
+    ordered.startDate,
+    ordered.endDate,
+  );
 
   return {
     ...ordered,

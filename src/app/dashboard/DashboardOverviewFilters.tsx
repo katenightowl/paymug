@@ -1,22 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CustomSelect } from "@/components/CustomSelect";
 import { DashboardDateRangePicker } from "./DashboardDateRangePicker";
+import { useDashboardMetricPreference } from "./dashboard-metric-preference.utils";
 import {
   dashboardFilterStatesMatch,
   hasDashboardFilterCookie,
   readDashboardFilterPreference,
   saveDashboardFilterPreference,
 } from "./dashboard-filter-preference.utils";
-import type {
-  DashboardFilterProps,
-  DashboardInterval,
-} from "./dashboard-overview.types";
+import type { DashboardOverviewFiltersProps } from "./dashboard-overview.types";
 
-export function DashboardOverviewFilters(props: DashboardFilterProps) {
+export function DashboardOverviewFilters(props: DashboardOverviewFiltersProps) {
   const router = useRouter();
+  const metrics = useMemo(
+    () => props.metricGroups.flatMap((group) => group.metrics),
+    [props.metricGroups]
+  );
+  const [selectedMetricKey, selectMetric] = useDashboardMetricPreference(
+    "main",
+    props.defaultMetricKey,
+    metrics
+  );
 
   useEffect(() => {
     const currentState = {
@@ -47,14 +54,11 @@ export function DashboardOverviewFilters(props: DashboardFilterProps) {
     router,
   ]);
 
-  function updateFilter(
-    interval: DashboardInterval,
-    productId: string
-  ) {
+  function updateProduct(productId: string) {
     const nextState = {
       startDate: props.startDate,
       endDate: props.endDate,
-      interval,
+      interval: props.interval,
       productId,
     };
     saveDashboardFilterPreference(nextState);
@@ -64,23 +68,21 @@ export function DashboardOverviewFilters(props: DashboardFilterProps) {
   return (
     <div className="flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-4 border-b border-[#e8e8ee]">
       <div className="flex flex-wrap items-center gap-7">
-        <DashboardDateRangePicker {...props} />
         <CustomSelect
-          value={props.interval}
-          onValueChange={(value) =>
-            updateFilter(value as DashboardInterval, props.productId)
-          }
-          options={[
-            { value: "daily", label: "Daily" },
-            { value: "weekly", label: "Weekly" },
-          ]}
+          value={selectedMetricKey}
+          onValueChange={selectMetric}
+          options={metrics.map((metric) => ({
+            value: metric.key,
+            label: metric.label,
+          }))}
           variant="plain"
-          ariaLabel="Graph interval"
+          ariaLabel="Select main graph"
           triggerClassName="text-sm font-medium"
         />
+        <DashboardDateRangePicker {...props} />
         <CustomSelect
           value={props.productId}
-          onValueChange={(value) => updateFilter(props.interval, value)}
+          onValueChange={updateProduct}
           options={[
             { value: "all", label: "All products" },
             ...props.products.map((product) => ({
@@ -93,13 +95,13 @@ export function DashboardOverviewFilters(props: DashboardFilterProps) {
           triggerClassName="max-w-56 text-sm font-medium"
         />
       </div>
-      <div className="flex items-center gap-5 text-sm text-[#74748f]">
+      <div className="flex items-center gap-5 text-xs text-[#74748f]">
         <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border-2 border-accent" />
-          Chosen period
+          <span className="h-2.5 w-2.5 rounded-full bg-accent" />
+          Current period
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border-2 border-[#f082dc]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#f082dc]" />
           Last period
         </span>
       </div>

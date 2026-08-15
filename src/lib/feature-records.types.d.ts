@@ -8,7 +8,8 @@ export type DashboardFeatureKey =
   | "affiliates"
   | "affiliate-clicks"
   | "affiliate-referrals"
-  | "affiliate-payouts";
+  | "affiliate-payouts"
+  | "pages";
 
 export type FeatureRecordValue =
   | string

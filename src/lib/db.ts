@@ -202,10 +202,15 @@ export async function createUser(user: CreateUserInput): Promise<User> {
   const email = user.email.toLowerCase();
   const storeId = user.activeStoreId || user.id;
 
-  const existingEmail = await db.query.users.findFirst({
-    where: eq(usersTable.email, email),
+  const existingAccount = await db.query.users.findFirst({
+    columns: { id: true, email: true },
   });
-  if (existingEmail) throw new Error("Email already registered");
+  if (existingAccount) {
+    if (existingAccount.email === email) {
+      throw new Error("Email already registered");
+    }
+    throw new Error("This installation already has an account");
+  }
 
   const existingSlug = await db.query.stores.findFirst({
     where: eq(storesTable.slug, user.storeSlug),

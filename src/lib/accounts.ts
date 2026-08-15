@@ -1,6 +1,5 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import type { CreateAccountInput } from "./accounts.types";
@@ -11,10 +10,15 @@ export async function createAccount(
 ): Promise<User> {
   const db = await getDb();
   const email = input.email.toLowerCase();
-  const existing = await db.query.users.findFirst({
-    where: eq(users.email, email),
+  const existingAccount = await db.query.users.findFirst({
+    columns: { id: true, email: true },
   });
-  if (existing) throw new Error("Email already registered");
+  if (existingAccount) {
+    if (existingAccount.email === email) {
+      throw new Error("Email already registered");
+    }
+    throw new Error("This installation already has an account");
+  }
 
   const pendingStoreSlug = `account-${input.id}`;
   await db.insert(users).values({

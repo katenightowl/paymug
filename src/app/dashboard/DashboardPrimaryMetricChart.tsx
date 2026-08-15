@@ -2,25 +2,24 @@
 
 import { useMemo } from "react";
 import { AreaChart } from "@/components/dashboard/charts";
-import { CustomSelect } from "@/components/CustomSelect";
 import { DeltaLine } from "./DashboardOverviewControls";
+import { DashboardGraphShareButton } from "./DashboardGraphShareButton";
 import { formatDashboardMetricValue } from "./dashboard-metric-chart.utils";
 import { useDashboardMetricPreference } from "./dashboard-metric-preference.utils";
 import type { DashboardPrimaryMetricChartProps } from "./dashboard-overview.types";
 
-export function DashboardPrimaryMetricChart({
-  metricGroups,
-  defaultMetricKey,
-  currency,
-}: DashboardPrimaryMetricChartProps) {
+export function DashboardPrimaryMetricChart(
+  props: DashboardPrimaryMetricChartProps,
+) {
+  const { metricGroups, defaultMetricKey, currency } = props;
   const metrics = useMemo(
     () => metricGroups.flatMap((group) => group.metrics),
-    [metricGroups]
+    [metricGroups],
   );
-  const [selectedMetricKey, selectMetric] = useDashboardMetricPreference(
+  const [selectedMetricKey] = useDashboardMetricPreference(
     "main",
     defaultMetricKey,
-    metrics
+    metrics,
   );
   const metric =
     metrics.find((candidate) => candidate.key === selectedMetricKey) ||
@@ -29,29 +28,24 @@ export function DashboardPrimaryMetricChart({
   if (!metric) return null;
 
   return (
-    <section className="pt-8">
-      <CustomSelect
-        value={metric.key}
-        onValueChange={selectMetric}
-        options={metrics.map((option) => ({
-          value: option.key,
-          label: option.label,
-        }))}
-        variant="plain"
-        ariaLabel="Select main graph"
-        triggerClassName="text-sm font-medium"
+    <section className="group relative pt-8">
+      <DashboardGraphShareButton
+        metric={metric}
+        currency={currency}
+        className="right-0 top-7"
       />
-      <div className="mt-3 flex flex-wrap items-center">
+      <div className="flex flex-wrap items-center">
         <p className="text-3xl font-medium leading-none tracking-[-0.04em] tabular-nums">
           {formatDashboardMetricValue(metric.value, metric.format, currency)}
         </p>
         <DeltaLine delta={metric.delta} />
       </div>
       <p className="mt-2 text-sm text-muted">
-        vs. {formatDashboardMetricValue(
+        vs.{" "}
+        {formatDashboardMetricValue(
           metric.previousValue,
           metric.format,
-          currency
+          currency,
         )}{" "}
         last period
       </p>

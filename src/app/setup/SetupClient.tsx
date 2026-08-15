@@ -214,10 +214,10 @@ export function SetupClient() {
           </Button>
         ) : configurationStatus === "complete" ? (
           <Link
-            href="/signup"
+            href="/setup/account"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-dark transition hover:bg-accent-hover"
           >
-            Create the first account
+            Continue to account setup
             <ArrowRight size={16} weight="bold" />
           </Link>
         ) : (

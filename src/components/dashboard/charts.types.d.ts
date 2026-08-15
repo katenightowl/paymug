@@ -27,6 +27,8 @@ export interface ChartProps {
   trendPercent?: number | null;
   locale?: string;
   gridEvery?: number;
+  showGrid?: boolean;
+  endpointLabelFontSize?: number;
   className?: string;
 }
 

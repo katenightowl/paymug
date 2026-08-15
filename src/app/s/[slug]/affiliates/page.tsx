@@ -2,7 +2,9 @@ import { Check } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppIcon } from "@/components/dashboard/Icon";
+import { StorefrontFooter } from "@/components/StorefrontFooter";
 import { listProductsByUser } from "@/lib/db";
+import { listStorePages } from "@/lib/store-pages";
 import { getStoreBySlug } from "@/lib/stores";
 import { AffiliateApplicationForm } from "./AffiliateApplicationForm";
 import { AffiliateEarningsCalculator } from "./AffiliateEarningsCalculator";
@@ -11,7 +13,6 @@ import {
   getAffiliateCommissionSummary,
 } from "./affiliate-program.utils";
 import type { AffiliateProgramPageProps } from "./page.types";
-import Powered from "@/components/PoweredBy";
 import { generateAffiliateProgramMetadata } from "./page-metadata.utils";
 
 export const generateMetadata = generateAffiliateProgramMetadata;
@@ -45,8 +46,15 @@ export default async function AffiliateProgramPage({
   const { slug } = await params;
   const store = await getStoreBySlug(slug);
   if (!store?.affiliatesEnabled) notFound();
-  const products = (await listProductsByUser(store.userId, store.id, "live")).filter(
-    (product) => product.status === "published",
+  const [allProducts, storePages] = await Promise.all([
+    listProductsByUser(store.userId, store.id, "live"),
+    listStorePages(store.userId, store.id, "live"),
+  ]);
+  const products = allProducts.filter((product) => product.status === "published");
+  const publishedPages = storePages.filter((page) => page.status === "published");
+  const topPages = publishedPages.filter((page) => page.navigation === "top");
+  const footerPages = publishedPages.filter(
+    (page) => page.navigation === "footer",
   );
   const initialProduct = products[0];
 
@@ -74,11 +82,20 @@ export default async function AffiliateProgramPage({
             aria-label="Store navigation"
           >
             <Link
-              href={`/s/${store.slug}`}
+              href="/"
               className="text-sm font-semibold hover:text-[#9b7600]"
             >
               Back to store
             </Link>
+            {topPages.map((page) => (
+              <Link
+                key={page.id}
+                href={`/${page.slug}`}
+                className="text-sm font-semibold hover:text-[#9b7600]"
+              >
+                {page.title}
+              </Link>
+            ))}
             <Link
               href="/customer/login"
               className="text-sm font-semibold hover:text-[#9b7600]"
@@ -213,9 +230,7 @@ export default async function AffiliateProgramPage({
         </section>
       </main>
 
-      <footer className="bg-[#f7f3e9] px-6 py-7">
-        <Powered storeSlug={slug} />
-      </footer>
+      <StorefrontFooter pages={footerPages} />
     </div>
   );
 }

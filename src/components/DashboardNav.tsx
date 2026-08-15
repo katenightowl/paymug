@@ -1,13 +1,11 @@
 "use client";
 
 import {
-  Check,
   DotsThree,
   EnvelopeSimple,
   GearSix,
   House,
   Network,
-  Plus,
   SignOut,
   SlidersHorizontal,
   Storefront,
@@ -28,12 +26,11 @@ import {
   isDashboardNavItemActive,
 } from "./dashboard-nav.utils";
 import type { DashboardNavProps } from "./DashboardNav.types";
+import clsx from "clsx";
+import { cardClass } from "./ui.styles";
 
 export function DashboardNav({
   storeName,
-  storeSlug,
-  activeStoreId,
-  stores,
   userName,
   environment,
   environmentAvailability,
@@ -43,7 +40,7 @@ export function DashboardNav({
 }: DashboardNavProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [storeMenuOpen, setStoreMenuOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const visibleNavGroups = getVisibleDashboardNavGroups(dashboardNavGroups, {
     affiliatesEnabled,
     emailCampaignsEnabled,
@@ -57,20 +54,6 @@ export function DashboardNav({
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
-    router.refresh();
-  }
-
-  async function switchStore(storeId: string) {
-    if (storeId === activeStoreId) {
-      setStoreMenuOpen(false);
-      return;
-    }
-    const response = await fetch(`/api/stores/${storeId}/activate`, {
-      method: "POST",
-    });
-    if (!response.ok) return;
-    setStoreMenuOpen(false);
-    router.push("/dashboard");
     router.refresh();
   }
 
@@ -139,49 +122,21 @@ export function DashboardNav({
           </Link>
         </nav>
 
-
-
         <DashboardEnvironmentSwitch
           environment={environment}
           availability={environmentAvailability}
         />
 
-        <div className="relative mx-6 flex shrink-0 items-center justify-between gap-3 border-t border-[#e8e8ee] pb-4 pt-2">
-          {storeMenuOpen && (
+
+        <div
+          className={clsx(
+            "relative mx-4 flex shrink-0 items-center justify-between gap-3 border-t border-[#e8e8ee] py-2 px-4 mb-4",
+            cardClass,
+          )}
+        >
+          {accountMenuOpen && (
             <div className="absolute bottom-full left-0 z-30 mb-2 w-full overflow-hidden rounded-xl border border-[#e8e8ee] bg-white py-2 shadow-xl">
-              <p className="px-3 pb-1 pt-1 text-sm font-semibold uppercase tracking-wide text-muted">
-                Stores
-              </p>
-              <div className="max-h-52 overflow-y-auto px-1">
-                {stores.map((store) => (
-                  <button
-                    key={store.id}
-                    type="button"
-                    onClick={() => switchStore(store.id)}
-                    className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:bg-[#f7f7f8]"
-                  >
-                    <span className="min-w-0 flex-1 truncate">
-                      {store.name}
-                    </span>
-                    {store.id === activeStoreId && (
-                      <Check
-                        size={15}
-                        weight="bold"
-                        className="text-[#178f55]"
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-1 border-t border-[#eeeeF2] px-1 pt-1">
-                <Link
-                  href="/dashboard/stores/new"
-                  onClick={() => setStoreMenuOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-[#f7f7f8]"
-                >
-                  <Plus size={16} />
-                  Create new store
-                </Link>
+              <div className="px-1">
                 <button
                   type="button"
                   onClick={logout}
@@ -193,28 +148,28 @@ export function DashboardNav({
               </div>
             </div>
           )}
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
+          <div>
+            {/* <p className="truncate text-sm font-semibold text-foreground">
               {storeName}
-            </p>
+            </p> */}
             <Link
-              href={`/s/${storeSlug}`}
-              target="_blank"
-              className="mt-0.5 block truncate text-sm text-muted hover:text-accent-hover"
+              href={`/dashboard/settings/store`}
+              className="block truncate text-sm font-medium hover:text-accent-hover"
             >
-              /s/{storeSlug}
+              {storeName}
             </Link>
           </div>
           <button
             type="button"
-            onClick={() => setStoreMenuOpen((open) => !open)}
+            onClick={() => setAccountMenuOpen((open) => !open)}
             className="shrink-0 cursor-pointer p-1.5 font-bold tracking-widest text-[#85859d] hover:text-accent-hover"
-            aria-label={`Open store menu for ${userName}`}
-            aria-expanded={storeMenuOpen}
+            aria-label={`Open account menu for ${userName}`}
+            aria-expanded={accountMenuOpen}
           >
             <DotsThree size={20} weight="bold" aria-hidden />
           </button>
         </div>
+
       </aside>
 
       <header className="row-start-1 border-b border-[#e8e8ee] bg-white lg:hidden">

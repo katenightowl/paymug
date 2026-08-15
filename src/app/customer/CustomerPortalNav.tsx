@@ -148,7 +148,7 @@ export function CustomerPortalNav({
             </div>
           </div>
         </div>
-        <Powered storeSlug={branding?.storeName} />
+        <Powered />
       </aside>
 
       <header className="row-start-1 border-b border-[#e8e8ee] bg-white lg:hidden">

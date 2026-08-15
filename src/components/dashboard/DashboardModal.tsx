@@ -59,7 +59,7 @@ export function DashboardModal({
         aria-labelledby={titleId}
         className="max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#e8e8ee] bg-white shadow-[0_24px_70px_rgba(24,22,32,0.2)]"
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#ededf2] bg-white px-5 py-4 sm:px-6">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-white px-5 pt-4 sm:px-6">
           <h2 id={titleId} className="text-lg font-semibold text-[#333]">
             {title}
           </h2>
