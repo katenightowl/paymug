@@ -6,6 +6,7 @@ import {
 } from "./homepage-storefront.utils";
 
 export const generateMetadata = generateHomepageMetadata;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const slug = await getHomepageStoreSlug();

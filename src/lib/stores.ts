@@ -126,7 +126,6 @@ export async function createStore(
     affiliateCommissionDuration: "one_time",
     affiliateAttributionModel: "last_click",
     emailCampaignsEnabled: true,
-    abandonedCheckoutRemindersEnabled: false,
     currency: "USD",
     transactionFeeType: "fixed",
     transactionFeeValue: 0,
