@@ -39,14 +39,14 @@ export function StoreSubscribeForm({
   }
 
   return (
-    <form onSubmit={subscribe} className="flex flex-col gap-3 mx-auto sm:flex-row sm:items-end max-w-md mt-5 relative">
+    <form onSubmit={subscribe} className="flex flex-col gap-3 mx-auto w-full sm:flex-row sm:items-end max-w-md mt-5 relative text-sm">
       <Input
         name="subscriberEmail"
         type="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         placeholder="Enter your email"
-        className="flex-1"
+        className="flex-1 *:py-3"
         required
       />
       <Button className="absolute top-1 right-1 rounded-lg" type="submit" disabled={saving}>

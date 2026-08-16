@@ -1018,7 +1018,7 @@ code, kbd, samp, pre {
   color: #9e6e07
 }
 
-.hover:text-accent-dark:hover,
-.group-hover:text-accent-dark:hover {
+[class*="hover:text-accent-dark"]:hover,
+[class*="group-hover:text-accent-dark"]:hover {
   color: #9e6e07
 }

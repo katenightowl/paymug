@@ -53,19 +53,27 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
     <div className="flex min-h-screen flex-col">
       {isTestMode && <StoreTestModeRibbon />}
       <main className="mx-auto w-full max-w-5xl flex-1 p-4 pb-12">
-        {seller.storeCoverImageUrl && (
-          <img
-            src={seller.storeCoverImageUrl}
-            alt={`${seller.storeName} store cover`}
-            className="aspect-[4/1] w-full rounded-2xl object-cover"
-          />
-        )}
+        <StorefrontNavigation
+          pages={topPages}
+          affiliatesEnabled={store?.affiliatesEnabled ?? false}
+          showDashboard={viewer?.id === seller.id}
+          className="mb-4 border border-border/60 rounded-full sticky top-4 bg-white/80 z-10 justify-center w-fit mx-auto px-4 backdrop-blur-xl"
+        />
 
         <header
-          className={`relative flex flex-col items-center text-center ${
-            seller.storeCoverImageUrl ? "-mt-6" : ""
-          }`}
+          className={clsx(
+            "relative flex flex-col items-center text-center",
+            seller.storeCoverImageUrl ? "" : "my-12"
+          )}
         >
+          {seller.storeCoverImageUrl && (
+            <img
+              src={seller.storeCoverImageUrl}
+              alt={`${seller.storeName} store cover`}
+              className="aspect-4/1 w-full object-cover -mb-6 -mt-10 rounded-2xl"
+            />
+          )}
+
           {store?.logoImageUrl ? (
             <img
               src={store.logoImageUrl}
@@ -83,24 +91,16 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
           <p className="mt-2 max-w-xl whitespace-pre-line text-muted">
             {store?.description || `Digital products from ${seller.name}`}
           </p>
-          <div className={clsx("mt-4 [&_nav]:justify-center", cardClass)}>
-            <StorefrontNavigation
-              pages={topPages}
-              affiliatesEnabled={store?.affiliatesEnabled ?? false}
-              showDashboard={viewer?.id === seller.id}
-            />
-          </div>
         </header>
-
 
         {products.length === 0 ? (
           <div
-            className={`${cardClass} mt-10 px-6 py-14 text-center text-sm text-muted`}
+            className={`${cardClass} mt-10 px-6 py-16 text-center text-sm text-muted`}
           >
             No products published yet.
           </div>
         ) : (
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="my-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((p) => (
               <Link
                 key={p.id}
@@ -111,7 +111,7 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
                   <img
                     src={p.imageUrl}
                     alt={p.name}
-                    className="aspect-[16/9] w-full object-cover rounded-md"
+                    className="aspect-[16/9] w-full object-cover rounded-xl"
                   />
                 ) : (
                   <div className="flex h-28 items-center justify-center bg-accent-soft text-3xl">
@@ -143,9 +143,9 @@ export default async function StorefrontPage({ params }: StorefrontPageProps) {
             ))}
           </div>
         )}
-
-        <StoreSubscribeForm storeSlug={seller.storeSlug} />
       </main>
+
+      <StoreSubscribeForm storeSlug={seller.storeSlug} />
       <StorefrontFooter pages={footerPages} />
     </div>
   );

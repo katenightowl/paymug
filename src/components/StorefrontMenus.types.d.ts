@@ -4,6 +4,7 @@ export interface StorefrontNavigationProps {
   pages: StorePage[];
   affiliatesEnabled: boolean;
   showDashboard?: boolean;
+  className?: string
 }
 
 export interface StorefrontFooterProps {

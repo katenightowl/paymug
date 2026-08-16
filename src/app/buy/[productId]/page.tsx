@@ -24,6 +24,7 @@ import { CheckoutClient } from "./CheckoutClient";
 import { formatProductPageMoney } from "./product-page.utils";
 import { generateProductMetadata } from "./page-metadata.utils";
 import type { BuyPageProps } from "./page.types";
+import Powered from "@/components/PoweredBy";
 
 export const generateMetadata = generateProductMetadata;
 
@@ -83,13 +84,11 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
           {product.environment === "sandbox" ? "test" : "draft"} product
         </div>
       )}
-      {isSandbox && (
-        <StoreTestModeRibbon />
-      )}
+      {isSandbox && <StoreTestModeRibbon />}
 
-      <main className="mx-auto grid max-w-5xl px-4 pb-10 pt-5 lg:grid-cols-5">
-        <div className="lg:col-span-3 lg:sticky lg:top-6 lg:self-start">
-          <div className="pr-8 lg:pr-14">
+      <main className="mx-auto flex lg:flex-row max-w-5xl px-4 pb-10 pt-5 gap-8 lg:gap-14">
+        <div className="flex flex-col gap-6 flex-1 min-h-0 min-w-0 lg:sticky lg:top-6">
+          <div className="flex-1">
             <header className="mx-auto flex w-full max-w-5xl items-center justify-between pb-4 mb-4 border-b border-border">
               <div className="flex h-8 items-center">
                 <Link
@@ -144,9 +143,11 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
               />
             )}
           </div>
+
+          <Powered />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="w-86">
           <div className={`${cardClass} sticky top-6 overflow-hidden`}>
             {/* <h2 className="font-semibold px-6 py-3 border-b border-border">
               Checkout

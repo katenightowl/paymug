@@ -199,10 +199,11 @@ export function CustomSelect({
                 }}
                 className={`flex w-full items-center gap-3 pr-4 pl-3 py-2.5  text-left text-sm leading-5 outline-none transition disabled:cursor-not-allowed disabled:opacity-45 ${
                   selected
-                    ? "bg-yellow-400/10 text-yellow-600"
+                    ? "bg-accent-soft text-yellow-700"
                     : "text-[#20304] hover:bg-[#f7f7f8]"
                 } 
-                // ${active ? "" : "hover:bg-[#f7f7f8]"}`}
+                
+                `}
               >
                 <span className="grid w-4 shrink-0 place-items-center">
                   {selected && <Check size={14} weight="bold" aria-hidden />}

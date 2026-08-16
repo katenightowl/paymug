@@ -123,7 +123,7 @@ export function DashboardSmallGraphs({
           variant="plain"
           ariaLabel="Add a small graph"
           triggerClassName="text-xs font-medium text-[#333] hover:text-accent-hover"
-          menuClassName="bottom-[calc(100%+0.65rem)] left-auto right-0 top-auto w-64"
+          menuClassName="bottom-[calc(100%+0.65rem)] left-auto right-0 top-auto w-74"
         />
       </div>
     </section>
