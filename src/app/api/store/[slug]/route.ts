@@ -10,7 +10,11 @@ export async function GET(_req: Request, ctx: Ctx) {
   if (!user) return jsonError("Store not found", 404);
   const store = await getStoreById(user.activeStoreId, user.id);
 
-  const products = (await listProductsByUser(user.id, user.activeStoreId, "live"))
+  const products = (await listProductsByUser(
+    user.id,
+    user.activeStoreId,
+    user.environment,
+  ))
     .filter((p) => p.status === "published")
     .map(({
       deliveryContent: _,

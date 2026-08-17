@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppIcon } from "@/components/dashboard/Icon";
 import { StorefrontFooter } from "@/components/StorefrontFooter";
-import { listProductsByUser } from "@/lib/db";
+import { StoreTestModeRibbon } from "@/components/StoreTestModeRibbon";
+import { findUserById, listProductsByUser } from "@/lib/db";
 import { listStorePages } from "@/lib/store-pages";
 import { getStoreBySlug } from "@/lib/stores";
 import { AffiliateApplicationForm } from "./AffiliateApplicationForm";
@@ -46,9 +47,12 @@ export default async function AffiliateProgramPage({
   const { slug } = await params;
   const store = await getStoreBySlug(slug);
   if (!store?.affiliatesEnabled) notFound();
+  const seller = await findUserById(store.userId);
+  if (!seller) notFound();
+  const environment = seller.environment;
   const [allProducts, storePages] = await Promise.all([
-    listProductsByUser(store.userId, store.id, "live"),
-    listStorePages(store.userId, store.id, "live"),
+    listProductsByUser(store.userId, store.id, environment),
+    listStorePages(store.userId, store.id, environment),
   ]);
   const products = allProducts.filter((product) => product.status === "published");
   const publishedPages = storePages.filter((page) => page.status === "published");
@@ -60,6 +64,7 @@ export default async function AffiliateProgramPage({
 
   return (
     <div className="landing-page min-h-screen">
+      {environment === "sandbox" && <StoreTestModeRibbon />}
       <main>
         <header className="mx-auto flex w-full max-w-[73.75rem] flex-col justify-between gap-8 px-6 py-10 sm:flex-row sm:items-start sm:px-8">
           <div className="flex max-w-xl flex-col items-start">

@@ -1,9 +1,9 @@
 import type { PayPalMode } from "./types";
 
 export function resolveStorefrontEnvironment(
-  sellerId: string,
+  _sellerId: string,
   sellerEnvironment: PayPalMode,
-  viewerId?: string,
+  _viewerId?: string,
 ): PayPalMode {
-  return viewerId === sellerId ? sellerEnvironment : "live";
+  return sellerEnvironment;
 }

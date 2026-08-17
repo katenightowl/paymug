@@ -8,6 +8,7 @@ import {
 } from "@/lib/feature-records";
 import { notifyAffiliateApplied } from "@/lib/notification-events";
 import { sendStoreAffiliateRegisteredEmail } from "@/lib/store-notification-emails";
+import { findUserById } from "@/lib/db";
 import { getStoreBySlug } from "@/lib/stores";
 import { jsonError } from "@/lib/utils";
 import type { PublicAffiliateApplicationRouteContext } from "./route.types";
@@ -28,6 +29,9 @@ export async function POST(
   const { id: storeSlug } = await params;
   const store = await getStoreBySlug(storeSlug);
   if (!store?.affiliatesEnabled) return jsonError("Not found", 404);
+  const seller = await findUserById(store.userId);
+  if (!seller) return jsonError("Not found", 404);
+  const environment = seller.environment;
   const parsed = affiliateApplicationSchema.safeParse(await request.json());
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message || "Invalid application");
@@ -36,7 +40,7 @@ export async function POST(
   const affiliates = await listFeatureRecords(
     store.userId,
     "affiliates",
-    "live"
+    environment
   );
   const email = parsed.data.email.toLowerCase();
   const existingApplication = affiliates.find(
@@ -56,7 +60,7 @@ export async function POST(
   const code = createUniqueAffiliateCode(email.split("@")[0], usedCodes);
   const signupMetadata = getAffiliateSignupMetadata(request);
   const applicationInput = {
-    environment: "live" as const,
+    environment,
     title: parsed.data.name,
     subtitle: email,
     status: "inactive",

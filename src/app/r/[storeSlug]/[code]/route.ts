@@ -32,7 +32,7 @@ export async function GET(
     seller.id,
     code,
     seller.activeStoreId,
-    "live"
+    seller.environment
   );
   if (!affiliate) {
     return NextResponse.redirect(

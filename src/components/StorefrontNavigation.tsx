@@ -45,7 +45,7 @@ export function StorefrontNavigation({
         href="/customer/login"
         className="text-sm font-medium text-foreground hover:text-accent-dark"
       >
-        Customer Portal
+        My Orders
       </Link>
     </nav>
   );
