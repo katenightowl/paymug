@@ -11,9 +11,7 @@ import {
 } from "@/lib/db";
 import { listFeatureRecords } from "@/lib/feature-records";
 import { getPayPalCredentials, getStripeCredentials } from "@/lib/payment-credentials";
-import { DashboardOverviewFilters } from "./DashboardOverviewFilters";
-import { DashboardPrimaryMetricChart } from "./DashboardPrimaryMetricChart";
-import { DashboardSmallGraphs } from "./DashboardSmallGraphs";
+import { DashboardOverview } from "./DashboardOverview";
 import {
   dashboardFilterCookieName,
   parseDashboardFilterCookie,
@@ -101,7 +99,7 @@ export default async function DashboardPage({
 
   return (
     <div className={dashboardPageClass}>
-      <DashboardOverviewFilters
+      <DashboardOverview
         startDate={filter.startDate}
         endDate={filter.endDate}
         interval={filter.interval}
@@ -113,37 +111,27 @@ export default async function DashboardPage({
         earliestDate={earliestDate}
         metricGroups={overview.metricGroups}
         defaultMetricKey={overview.primary.key}
-      />
-
-      {!(store?.paymentGateway === "stripe" ? stripe : paypal) && (
-        <div className="mt-6 flex flex-col gap-3 rounded-xl border border-[#f2d991] bg-[#fffaf0] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              Connect a payment gateway to accept payments
-            </p>
-            <p className="mt-1 text-sm text-muted">
-              Buyers pay your account directly — Paymug never holds funds.
-            </p>
+        currency={overview.currency}
+      >
+        {!(store?.paymentGateway === "stripe" ? stripe : paypal) && (
+          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-[#f2d991] bg-[#fffaf0] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Connect a payment gateway to accept payments
+              </p>
+              <p className="mt-1 text-sm text-muted">
+                Buyers pay your account directly — Paymug never holds funds.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/settings/payments"
+              className={`${dashboardButtonBaseClass} bg-[#27272f] text-white hover:bg-[#3a3a45]`}
+            >
+              Connect payments
+            </Link>
           </div>
-          <Link
-            href="/dashboard/settings/payments"
-            className={`${dashboardButtonBaseClass} bg-[#27272f] text-white hover:bg-[#3a3a45]`}
-          >
-            Connect payments
-          </Link>
-        </div>
-      )}
-
-      <DashboardPrimaryMetricChart
-        metricGroups={overview.metricGroups}
-        defaultMetricKey={overview.primary.key}
-        currency={overview.currency}
-      />
-
-      <DashboardSmallGraphs
-        metricGroups={overview.metricGroups}
-        currency={overview.currency}
-      />
+        )}
+      </DashboardOverview>
     </div>
   );
 }

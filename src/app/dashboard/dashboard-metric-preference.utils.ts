@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { DashboardMetricSeries } from "./dashboard-overview.types";
+import type {
+  DashboardMetricPreferenceEventDetail,
+  DashboardMetricSeries,
+} from "./dashboard-overview.types";
+
+const dashboardMetricPreferenceEvent = "paymug:dashboard-metric-change";
 
 function getDashboardMetricStorageKey(scope: string) {
   return `paymug.dashboard.metric.${scope}`;
@@ -32,6 +37,28 @@ export function useDashboardMetricPreference(
     setSelectedMetricKey(nextMetricKey);
   }, [defaultMetricKey, metrics, scope]);
 
+  useEffect(() => {
+    const syncMetricSelection = (event: Event) => {
+      const detail = (event as CustomEvent<DashboardMetricPreferenceEventDetail>)
+        .detail;
+      if (
+        detail.scope === scope &&
+        metrics.some((metric) => metric.key === detail.metricKey)
+      ) {
+        setSelectedMetricKey(detail.metricKey);
+      }
+    };
+    window.addEventListener(
+      dashboardMetricPreferenceEvent,
+      syncMetricSelection,
+    );
+    return () =>
+      window.removeEventListener(
+        dashboardMetricPreferenceEvent,
+        syncMetricSelection,
+      );
+  }, [metrics, scope]);
+
   const selectMetric = useCallback(
     (metricKey: string) => {
       if (!metrics.some((metric) => metric.key === metricKey)) return;
@@ -44,6 +71,12 @@ export function useDashboardMetricPreference(
       } catch {
         // The in-memory selection still works when storage is unavailable.
       }
+      window.dispatchEvent(
+        new CustomEvent<DashboardMetricPreferenceEventDetail>(
+          dashboardMetricPreferenceEvent,
+          { detail: { scope, metricKey } },
+        ),
+      );
     },
     [metrics, scope]
   );

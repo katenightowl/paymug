@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { AreaChart } from "@/components/dashboard/charts";
 import { DeltaLine } from "./DashboardOverviewControls";
 import { DashboardGraphShareButton } from "./DashboardGraphShareButton";
+import { accumulateDashboardChartPoints } from "./dashboard-accumulated-values.utils";
 import { formatDashboardMetricValue } from "./dashboard-metric-chart.utils";
 import { useDashboardMetricPreference } from "./dashboard-metric-preference.utils";
 import type { DashboardPrimaryMetricChartProps } from "./dashboard-overview.types";
@@ -11,7 +12,12 @@ import type { DashboardPrimaryMetricChartProps } from "./dashboard-overview.type
 export function DashboardPrimaryMetricChart(
   props: DashboardPrimaryMetricChartProps,
 ) {
-  const { metricGroups, defaultMetricKey, currency } = props;
+  const {
+    metricGroups,
+    defaultMetricKey,
+    currency,
+    showAccumulatedValues,
+  } = props;
   const metrics = useMemo(
     () => metricGroups.flatMap((group) => group.metrics),
     [metricGroups],
@@ -27,10 +33,18 @@ export function DashboardPrimaryMetricChart(
 
   if (!metric) return null;
 
+  const data = showAccumulatedValues
+    ? accumulateDashboardChartPoints(metric.data)
+    : metric.data;
+  const comparisonData = showAccumulatedValues
+    ? accumulateDashboardChartPoints(metric.comparisonData)
+    : metric.comparisonData;
+  const displayedMetric = { ...metric, data, comparisonData };
+
   return (
     <section className="group relative pt-8">
       <DashboardGraphShareButton
-        metric={metric}
+        metric={displayedMetric}
         currency={currency}
         className="right-0 top-7"
       />
@@ -51,8 +65,8 @@ export function DashboardPrimaryMetricChart(
       </p>
       <div className="mt-7">
         <AreaChart
-          data={metric.data}
-          comparisonData={metric.comparisonData}
+          data={data}
+          comparisonData={comparisonData}
           height={260}
           color="#f5c518"
           comparisonColor="#f082dc"

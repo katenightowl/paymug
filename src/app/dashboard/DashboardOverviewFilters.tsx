@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CustomSelect } from "@/components/CustomSelect";
 import { DashboardDateRangePicker } from "./DashboardDateRangePicker";
+import { DashboardGraphMenu } from "./DashboardGraphMenu";
 import { useDashboardMetricPreference } from "./dashboard-metric-preference.utils";
 import {
   dashboardFilterStatesMatch,
@@ -104,6 +105,15 @@ export function DashboardOverviewFilters(props: DashboardOverviewFiltersProps) {
           <span className="h-2.5 w-2.5 rounded-full bg-[#f082dc]" />
           Last period
         </span>
+        <DashboardGraphMenu
+          availableMetrics={props.availableMetrics}
+          showAccumulatedValues={props.showAccumulatedValues}
+          onAddGraph={props.onAddGraph}
+          onResetGraphs={props.onResetGraphs}
+          onShowAccumulatedValuesChange={
+            props.onShowAccumulatedValuesChange
+          }
+        />
       </div>
     </div>
   );
