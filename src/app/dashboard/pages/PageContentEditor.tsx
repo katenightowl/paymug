@@ -82,7 +82,7 @@ export function PageContentEditor({
   return (
     <div
       ref={holderRef}
-      className="min-h-96 text-[1.08rem] leading-8 [&_.ce-block__content]:max-w-[42rem] [&_.ce-toolbar__content]:max-w-[46rem] [&_.codex-editor__redactor]:pb-20! [&_h2.ce-header]:text-3xl [&_h2.ce-header]:font-bold [&_h3.ce-header]:text-2xl [&_h3.ce-header]:font-semibold [&_h4.ce-header]:text-xl [&_h4.ce-header]:font-semibold"
+      className="min-h-96 text-[1.08rem] leading-8 text-foreground [&_.ce-block__content]:max-w-[42rem] [&_.ce-toolbar__content]:max-w-[46rem] [&_.codex-editor__redactor]:pb-20! [&_h2.ce-header]:mt-10 [&_h2.ce-header]:text-3xl [&_h2.ce-header]:font-semibold [&_h3.ce-header]:mt-8 [&_h3.ce-header]:text-2xl [&_h3.ce-header]:font-semibold [&_h4.ce-header]:text-base [&_h4.ce-header]:font-semibold [&_.image-tool]:my-8 [&_.image-tool__caption]:text-muted"
     />
   );
 }

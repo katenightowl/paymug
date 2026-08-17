@@ -121,12 +121,7 @@ export function PageEditor({ page }: PageEditorProps) {
                 <Alert>{error}</Alert>
               </div>
             )}
-            <PageCoverUploader
-              imageUrl={coverImageUrl}
-              onChange={setCoverImageUrl}
-              onError={setError}
-            />
-            <div className="mx-auto max-w-[42rem] px-3 pb-12 pt-10">
+            <div className="mx-auto max-w-[42rem] pb-12 pt-6 sm:pb-16">
               <textarea
                 value={title}
                 onChange={(event) => {
@@ -137,7 +132,7 @@ export function PageEditor({ page }: PageEditorProps) {
                 rows={2}
                 maxLength={160}
                 placeholder="Page title"
-                className="w-full resize-none border-0 bg-transparent text-5xl font-bold leading-[1.05] tracking-[-0.045em] outline-none placeholder:text-[#c6c5c1]"
+                className="w-full resize-none border-0 bg-transparent text-5xl font-bold leading-[1.04] tracking-[-0.045em] text-foreground outline-none placeholder:text-[#c6c5c1] sm:text-6xl"
               />
               <textarea
                 value={description}
@@ -145,10 +140,17 @@ export function PageEditor({ page }: PageEditorProps) {
                 rows={2}
                 maxLength={320}
                 placeholder="Add a short description…"
-                className="mt-5 w-full resize-none border-0 bg-transparent text-xl leading-8 text-muted outline-none placeholder:text-[#c6c5c1]"
+                className="mt-6 w-full resize-none border-0 bg-transparent text-xl leading-8 text-muted outline-none placeholder:text-[#c6c5c1]"
               />
             </div>
-            <PageContentEditor value={content} onChange={setContent} />
+            <PageCoverUploader
+              imageUrl={coverImageUrl}
+              onChange={setCoverImageUrl}
+              onError={setError}
+            />
+            <div className="py-12 sm:py-16">
+              <PageContentEditor value={content} onChange={setContent} />
+            </div>
           </article>
         </main>
 

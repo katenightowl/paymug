@@ -34,10 +34,9 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
 
   const product = await findProductById(productId);
   if (!product) notFound();
-  const isPreview =
-    product.status !== "published" || product.environment === "sandbox";
+  const isPreview = product.status !== "published";
   if (isPreview) {
-    if (product.status !== "published" && preview === undefined) notFound();
+    if (preview === undefined) notFound();
     const user = await getSessionUser();
     if (user?.id !== product.userId) notFound();
   }
@@ -78,10 +77,9 @@ export default async function BuyPage({ params, searchParams }: BuyPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      {isPreview && !isSandbox && (
+      {isPreview && (
         <div className="bg-amber-100 px-6 py-2 text-center text-sm text-amber-900">
-          Preview — this is a{" "}
-          {product.environment === "sandbox" ? "test" : "draft"} product
+          Preview — this is a draft product
         </div>
       )}
       {isSandbox && <StoreTestModeRibbon />}

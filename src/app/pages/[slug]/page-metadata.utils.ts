@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getProductDescriptionPlainText } from "@/components/product-description.utils";
 import { getSessionUser } from "@/lib/auth";
+import { findUserById } from "@/lib/db";
 import { buildPublicPageMetadata } from "@/lib/public-page-metadata";
 import { findStorePageBySlug } from "@/lib/store-pages";
 import { resolveStorefrontEnvironment } from "@/lib/storefront-environment.utils";
@@ -13,10 +14,14 @@ export async function generatePublicStorePageMetadata({
   const { slug } = await params;
   const store = await getPrimaryStore();
   if (!store) return { title: "Page not found", robots: { index: false } };
-  const viewer = await getSessionUser();
+  const [viewer, seller] = await Promise.all([
+    getSessionUser(),
+    findUserById(store.userId),
+  ]);
+  if (!seller) return { title: "Page not found", robots: { index: false } };
   const environment = resolveStorefrontEnvironment(
     store.userId,
-    viewer?.environment || "live",
+    seller.environment,
     viewer?.id,
   );
   const page = await findStorePageBySlug(

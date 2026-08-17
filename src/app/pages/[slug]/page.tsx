@@ -6,6 +6,7 @@ import { StorefrontFooter } from "@/components/StorefrontFooter";
 import { StorefrontNavigation } from "@/components/StorefrontNavigation";
 import { StoreTestModeRibbon } from "@/components/StoreTestModeRibbon";
 import { getSessionUser } from "@/lib/auth";
+import { findUserById } from "@/lib/db";
 import { findStorePageBySlug, listStorePages } from "@/lib/store-pages";
 import { resolveStorefrontEnvironment } from "@/lib/storefront-environment.utils";
 import { getPrimaryStore } from "@/lib/stores";
@@ -20,10 +21,14 @@ export default async function PublicStorePage({
   const { slug } = await params;
   const store = await getPrimaryStore();
   if (!store) notFound();
-  const viewer = await getSessionUser();
+  const [viewer, seller] = await Promise.all([
+    getSessionUser(),
+    findUserById(store.userId),
+  ]);
+  if (!seller) notFound();
   const environment = resolveStorefrontEnvironment(
     store.userId,
-    viewer?.environment || "live",
+    seller.environment,
     viewer?.id,
   );
   const [page, pages] = await Promise.all([
@@ -65,7 +70,7 @@ export default async function PublicStorePage({
       </header>
       <main className="flex-1 px-4 pb-24">
         <article className="mx-auto max-w-4xl">
-          <div className="mx-auto max-w-[42rem] py-12 sm:py-16">
+          <div className="mx-auto max-w-[42rem] pb-12 sm:pb-16 pt-6">
             <h1 className="text-5xl font-bold leading-[1.04] tracking-[-0.045em] sm:text-6xl">
               {page.title}
             </h1>
