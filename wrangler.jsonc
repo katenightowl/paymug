@@ -43,9 +43,6 @@
 	},
 	"upload_source_maps": true,
 	"keep_vars": true,
-	"vars": {
-		"EMAIL_FROM": "Paymug <updates@paymug.co>"
-	},
 	/**
 	 * D1 (SQLite) — used via Drizzle ORM (`src/db`).
 	 * D1 and R2 are intentionally declared without account-specific resource IDs.
@@ -54,7 +51,6 @@
 	"d1_databases": [
 		{
 			"database_name": "paymug",
-			"database_id": "b3b7f615-f3b1-4bdf-9f0a-e099b8cb6700",
 			"binding": "DB",
 			"migrations_dir": "drizzle"
 		}
