@@ -126,7 +126,7 @@ export function DashboardGraphShareModal({
                 comparisonData={metric.comparisonData}
                 height={420}
                 color={background.lineColor}
-                comparisonColor="#f082dc"
+                comparisonColor="#a3a3ad"
                 fillOpacity={0.05}
                 showAxis={false}
                 currency={currency}

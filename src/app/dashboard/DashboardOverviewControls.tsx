@@ -57,8 +57,9 @@ export function DeltaLine({ delta }: DeltaLineProps) {
     );
   }
 
-  const up = delta > 0;
-  const flat = Math.abs(delta) < 0.05;
+  const roundedDelta = Math.round(delta);
+  const up = roundedDelta > 0;
+  const flat = roundedDelta === 0;
 
   return (
     <span
@@ -68,7 +69,7 @@ export function DeltaLine({ delta }: DeltaLineProps) {
           : "bg-[#fff0f4] text-[#ef174c]"
       }`}
     >
-      {flat ? "0%" : `${up ? "↑" : "↓"} ${Math.abs(delta)}%`}
+      {flat ? "0%" : `${up ? "↑" : "↓"} ${Math.abs(roundedDelta)}%`}
     </span>
   );
 }

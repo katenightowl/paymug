@@ -69,7 +69,7 @@ export function DashboardPrimaryMetricChart(
           comparisonData={comparisonData}
           height={260}
           color="#f5c518"
-          comparisonColor="#f082dc"
+          comparisonColor="#a3a3ad"
           fillOpacity={0.025}
           showAxis={false}
           currency={currency}

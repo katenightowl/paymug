@@ -74,7 +74,7 @@ export function DashboardMetricChart({
           comparisonData={metric.comparisonData}
           height={130}
           color="#f5c518"
-          comparisonColor="#f082dc"
+          comparisonColor="#a3a3ad"
           fillOpacity={0.025}
           showAxis={false}
           currency={currency}
